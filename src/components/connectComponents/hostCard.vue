@@ -1,7 +1,6 @@
 <template>
   <div
     class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium"
-    :class="{ 'uk-card-secondary': $store.state.globalSettings.darkMode }"
   >
     <div class="uk-card-media-top">
       <div class="snapshot-container uk-width-1-1 uk-height-auto">

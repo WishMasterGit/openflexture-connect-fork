@@ -127,9 +127,9 @@
 <script>
 // Import mDNS package if running in Electron
 var mdns = require("mdns-js");
+const { BrowserWindow } = require("electron").remote;
 
 import axios from "axios";
-
 import hostCard from "./connectComponents/hostCard.vue";
 
 // Export main app
@@ -145,13 +145,15 @@ export default {
       localMode: true,
       hostname: "",
       port: 5000,
-      selectedHost: "",
       savedHosts: [],
       foundHosts: {}
     };
   },
 
   computed: {
+    selectedHostURL: function() {
+      return `http://${this.hostname}:${this.port}`;
+    },
     foundHostArray: function() {
       return Object.values(this.foundHosts);
     },
@@ -207,14 +209,14 @@ export default {
       });
 
       browser.on("update", data => {
-        console.log(data);
+        //console.log(data);
 
         // We will be checking if it's a valid openflexure device
         var validDevice = false;
 
         // Go through each type of the host, make valid if 'openflexure' appears
         data.type.forEach(element => {
-          console.log(element);
+          //console.log(element);
           if (element.name === "openflexure") {
             validDevice = true;
           }
@@ -230,28 +232,24 @@ export default {
           this.$set(this.foundHosts, hostData.hostname, hostData);
         }
 
-        console.log(this.foundHosts);
+        //console.log(this.foundHosts);
       });
     }
   },
 
   methods: {
-    connectToHost: function(host) {
-      console.log(host);
-      // Set the global form values
-      this.hostname = host.hostname;
-      this.port = host.port;
-
+    connectToSelectedHost: function() {
       // Try to get list of available routes
+      // TODO: Include some logic to determine what kind of instrument we're connecting to
+      // TODO: Read baseURL from mDNS entries where given?
       axios
-        .get(`${this.selectedHost}/routes`)
+        .get(`${this.selectedHostURL}/routes`)
         .then(response => {
-          console.log(response.data);
           // If the /api/v2 route is available
           if (Object.keys(response.data).includes("/api/v2/")) {
             console.log("API v2 available");
-            // Check client and server match
-            this.checkServerVersion();
+            let win = new BrowserWindow({ width: 1200, height: 900 });
+            win.loadURL(this.selectedHostURL);
           } else {
             // Error and no-connect if API v2 is missing
             var ApiVersionError = `Your microscope is running an old API version.\
@@ -276,64 +274,18 @@ export default {
       }
 
       // Handle auto-local-connect
-      var hostname;
       if (this.localMode) {
-        hostname = "localhost";
-      } else {
-        hostname = this.hostname;
+        this.hostname = "localhost";
       }
 
-      var selectedHost = {
-        hostname: hostname,
-        port: this.port
-      };
-
-      this.connectToHost(selectedHost);
+      this.connectToSelectedHost();
     },
 
     handleConnectButton: function(host) {
       this.computedLocalMode = false;
-      this.connectToHost(host);
-    },
-
-    checkServerVersion: function() {
-      var versionUri = `${this.selectedHost}/api/v2/instrument/configuration/application/version`;
-      axios
-        .get(versionUri)
-        .then(response => {
-          var serverVersion = response.data;
-          var clientVersion = process.env.PACKAGE.version;
-          var clientVersionMajor = clientVersion.substring(0, 3);
-          console.log(clientVersionMajor);
-
-          if (serverVersion != undefined) {
-            var serverVersionMajor = serverVersion.substring(0, 3);
-          }
-          console.log(serverVersionMajor);
-
-          if (
-            serverVersion == undefined ||
-            serverVersionMajor != clientVersionMajor
-          ) {
-            var versionWarning = `Client and microscope versions do not match.\
-            Please update your microscope software.\
-            <b>Client version:</b> ${clientVersion}<br> \
-            <b>Server version:</b> ${serverVersion}<br><br>`;
-            if (serverVersion < 1.1) {
-              versionWarning =
-                versionWarning +
-                "You will need to install a newer server version on a clean SD card.";
-            } else {
-              versionWarning =
-                versionWarning +
-                "Run <b><tt>ofm update</tt></b> and then <b><tt>ofm upgrade</tt></b> on your microscope.";
-            }
-            this.modalDialog("Version mismatch", versionWarning);
-          }
-        })
-        .catch(error => {
-          this.modalError(error); // Let mixin handle error
-        });
+      this.hostname = host.hostname;
+      this.port = host.port;
+      this.connectToSelectedHost();
     },
 
     delSavedHost: function(host) {
@@ -346,7 +298,7 @@ export default {
 
     saveHost: function() {
       // URI to get hostname directly from settings
-      var hostnameUri = `${this.selectedHost}/api/v2/instrument/settings/name`;
+      var hostnameUri = `${this.selectedHostURL}/api/v2/instrument/settings/name`;
       axios
         .get(hostnameUri)
         .then(response => {
@@ -355,8 +307,8 @@ export default {
           // We use unshift instead of push to add the entry to the beginning of the array
           this.savedHosts.unshift({
             name: deviceName,
-            hostname: this.$store.state.host,
-            port: this.$store.state.port
+            hostname: this.host,
+            port: this.port
           });
         })
         .catch(error => {
