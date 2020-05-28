@@ -42,7 +42,6 @@
                   >
                   <input
                     v-model="hostname"
-                    :class="IpFormClasses"
                     class="uk-input uk-form-small"
                     type="text"
                     placeholder="Hostname or IP address"
@@ -75,19 +74,10 @@
             </button>
 
             <button
-              v-if="$store.getters.ready"
               class="uk-button uk-button-default uk-form-small uk-margin-small uk-width-1-1"
               @click="saveHost()"
             >
               Save Current
-            </button>
-
-            <button
-              v-if="$store.getters.ready"
-              class="uk-button uk-button-danger uk-form-small uk-float-right uk-margin uk-margin-remove-top uk-width-1-1"
-              @click="$store.commit('resetState')"
-            >
-              Disconnect
             </button>
           </div>
         </div>
@@ -95,7 +85,7 @@
 
       <div class="uk-width-expand">
         <ul uk-accordion="multiple: true; animation: false">
-          <li v-show="isElectron" id="nearby-connections-grid" class="uk-open">
+          <li id="nearby-connections-grid" class="uk-open">
             <a class="uk-accordion-title" href="#">Nearby devices</a>
             <div class="uk-accordion-content">
               <div class="uk-grid-medium uk-grid-match uk-margin-top" uk-grid>
@@ -136,10 +126,7 @@
 
 <script>
 // Import mDNS package if running in Electron
-import isElectron from "../../modules/isElectron";
-if (isElectron()) {
-  var mdns = require("mdns-js");
-}
+var mdns = require("mdns-js");
 
 import axios from "axios";
 
@@ -155,7 +142,6 @@ export default {
 
   data: function() {
     return {
-      isElectron: isElectron(),
       localMode: true,
       hostname: "",
       port: 5000,
@@ -169,13 +155,6 @@ export default {
     foundHostArray: function() {
       return Object.values(this.foundHosts);
     },
-    // Stylises the hostname input box based on connection status
-    IpFormClasses: function() {
-      return {
-        "uk-form-danger": !this.$store.state.available,
-        "uk-form-success": this.$store.getters.ready
-      };
-    },
 
     computedLocalMode: {
       get: function() {
@@ -183,7 +162,6 @@ export default {
       },
       set: function(state) {
         this.localMode = state;
-        this.setLocalMode(state);
       }
     },
 
@@ -213,9 +191,6 @@ export default {
   },
 
   mounted() {
-    // Propagate localMode settings
-    this.setLocalMode(this.localMode);
-
     // Try loading savedHosts from localStorage. If null, don't change.
     this.savedHosts = this.getLocalStorageObj("savedHosts") || this.savedHosts;
 
@@ -267,20 +242,14 @@ export default {
       this.hostname = host.hostname;
       this.port = host.port;
 
-      // Commit the hostname and port to store
-      this.$store.commit("resetState");
-      this.$store.commit("changeHost", [host.hostname, host.port]);
-      this.$store.commit("changeWaiting", true);
       // Try to get list of available routes
       axios
-        .get(`${this.$store.getters.baseUri}/routes`)
+        .get(`${this.selectedHost}/routes`)
         .then(response => {
           console.log(response.data);
           // If the /api/v2 route is available
           if (Object.keys(response.data).includes("/api/v2/")) {
             console.log("API v2 available");
-            // Tell Vuex store that we're connected
-            this.$store.commit("setConnected");
             // Check client and server match
             this.checkServerVersion();
           } else {
@@ -292,11 +261,9 @@ export default {
             <br><br>
             <b>Downloads and instructions can be found <a target="_blank" href="https://openflexure.org/projects/microscope/install">here</a></b>`;
             this.modalDialog("API upgrade required", ApiVersionError);
-            this.$store.commit("setError");
           }
         })
         .catch(error => {
-          this.$store.commit("setError");
           this.modalError(error); // Let mixin handle error
         });
     },
@@ -330,7 +297,7 @@ export default {
     },
 
     checkServerVersion: function() {
-      var versionUri = `${this.$store.getters.baseUri}/api/v2/instrument/configuration/application/version`;
+      var versionUri = `${this.selectedHost}/api/v2/instrument/configuration/application/version`;
       axios
         .get(versionUri)
         .then(response => {
@@ -369,12 +336,6 @@ export default {
         });
     },
 
-    setLocalMode: function(state) {
-      this.$store.commit("changeSetting", ["trackWindow", state]);
-      this.$store.commit("changeSetting", ["disableStream", state]);
-      this.$store.commit("changeSetting", ["autoGpuPreview", state]);
-    },
-
     delSavedHost: function(host) {
       console.log(host);
       var index = this.savedHosts.indexOf(host);
@@ -385,7 +346,7 @@ export default {
 
     saveHost: function() {
       // URI to get hostname directly from settings
-      var hostnameUri = `${this.$store.getters.baseUri}/api/v2/instrument/settings/name`;
+      var hostnameUri = `${this.selectedHost}/api/v2/instrument/settings/name`;
       axios
         .get(hostnameUri)
         .then(response => {

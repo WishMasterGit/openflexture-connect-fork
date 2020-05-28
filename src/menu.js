@@ -5,9 +5,6 @@ const path = require("path");
 
 const openAboutWindow = require("about-window").default;
 
-const main = require("./app");
-const { store } = require("./store");
-
 const template = [
   {
     label: "Edit",
@@ -29,16 +26,7 @@ const template = [
       { role: "forcereload" },
       { role: "toggledevtools" },
       { type: "separator" },
-      { role: "togglefullscreen" },
-      { type: "separator" },
-      {
-        type: "checkbox",
-        checked: store.get("drawCustomTitleBar"),
-        label: "Custom titlebar",
-        click() {
-          main.toggleCustomTitleBar();
-        }
-      }
+      { role: "togglefullscreen" }
     ]
   },
   {

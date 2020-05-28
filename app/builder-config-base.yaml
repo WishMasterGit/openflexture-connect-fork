@@ -28,3 +28,34 @@ files:
       - '!**/platforms${/*}'
       - '!**/release-builds${/*}'
       - '!src${/*}'
+win:
+  target:
+    - appx
+  target:
+    - NSIS
+  icon: app/icons/win/icon.ico
+appx:
+  applicationId: OpenFlexureEV
+  identityName: 60425J.T.Collins.OpenFlexureeV
+  publisher: CN=CC867BEF-0715-4D48-8035-8881993DBB68
+  publisherDisplayName: J. T. Collins
+  backgroundColor: '#C5247F'
+linux:
+  target:
+    - target: appImage
+      arch:
+        - x64
+        - armv7l
+  icon: app/icons/png/
+  category: Science
+mac:
+  icon: app/icons/mac/icon.icns
+  category: public.app-category.utilities
+dmg:
+  contents:
+    - x: 110
+      y: 150
+    - x: 240
+      y: 150
+      type: link
+      path: /Applications

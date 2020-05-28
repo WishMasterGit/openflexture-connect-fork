@@ -4,23 +4,12 @@
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope Server",
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
-  "homepage": "https://gitlab.com/openflexure/openflexure-microscope-jsclient",
-  "productName": "OpenFlexure eV",
-  "publisher": "Bath Open Instrumentation Group",
-  "displayName": "OpenFlexure eV",
-  "license": "GNU General Public License v3.0 ",
-  "main": "./app/app.js",
   "scripts": {
-    "build": "vue-cli-service build --mode production.app",
-    "serve": "vue-cli-service serve  --mode development.web",
-    "start": "npm run build:app && electron app/app.js",
-    "dist:linux": "electron-builder --linux --config app/builder-config-x86_64.yaml",
-    "dist:raspi": "electron-builder --linux --config app/builder-config-raspi.yaml",
-    "dist:win": "electron-builder --win --config app/builder-config-x86_64.yaml",
-    "dist:dmg": "electron-builder --mac --config app/builder-config-x86_64.yaml",
-    "dist:appx": "electron-builder --win --config app/builder-config-appx.yaml",
-    "release": "electron-builder --linux --config app/builder-config-raspi.yaml & electron-builder --win --linux --config app/builder-config-x86_64.yaml",
-    "make-icons": "electron-icon-builder --input=./app/icons/icon_base.png --output=./app/"
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "make-icons": "electron-icon-builder --input=./app/icons/icon_base.png --output=./app/",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
   },
   "dependencies": {
     "about-window": "^1.13.2",
@@ -49,14 +38,8 @@
     "mdns-js": "^1.0.3",
     "uikit": "^3.4.6",
     "vue": "^2.6.11",
-    "vue-friendly-iframe": "^0.17.0",
-    "vue-plugin-load-script": "^1.2.0",
-    "vue-template-compiler": "^2.6.11",
-    "vue-tour": "^1.3.1",
-    "vuex": "^3.4.0"
-  },
-  "optionalDependencies": {
-    "electron-windows-store": "^2.1.0"
+    "vue-cli-plugin-electron-builder": "^1.4.6",
+    "vue-template-compiler": "^2.6.11"
   },
   "postcss": {
     "plugins": {
@@ -67,5 +50,14 @@
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "displayName": "OpenFlexure eV",
+  "homepage": "https://gitlab.com/openflexure/openflexure-microscope-jsclient",
+  "license": "GNU General Public License v3.0 ",
+  "main": "background.js",
+  "optionalDependencies": {
+    "electron-windows-store": "^2.1.0"
+  },
+  "productName": "OpenFlexure eV",
+  "publisher": "Bath Open Instrumentation Group"
 }

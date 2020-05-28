@@ -1,32 +1,12 @@
-var webpack = require("webpack");
+// this file is for cases where we need to access the
+// webpack config as a file when using CLI commands.
 
-module.exports = {
-  configureWebpack: config => {
-    (config.target = process.env.VUE_APP_TARGET || "web"),
-      (config.entry =
-        process.env.VUE_APP_TARGET == "electron-renderer"
-          ? {
-              main: "./src/main.js",
-              app: "./src/main.app.js"
-            }
-          : {
-              main: "./src/main.js"
-            }),
-      config.plugins.push(
-        new webpack.DefinePlugin({
-          "process.env": {
-            PACKAGE: JSON.stringify(require("./package.json"))
-          }
-        })
-      );
-  },
-  outputDir: (function() {
-    if (process.env.VUE_APP_TARGET == "electron-renderer") {
-      return "./app/dist";
-    } else {
-      return "./dist";
-    }
-  })(),
+let service = process.VUE_CLI_SERVICE;
 
-  publicPath: ""
-};
+if (!service || process.env.VUE_CLI_API_MODE) {
+  const Service = require("@vue/cli-service/lib/Service");
+  service = new Service(process.env.VUE_CLI_CONTEXT || process.cwd());
+  service.init(process.env.VUE_CLI_MODE || process.env.NODE_ENV);
+}
+
+module.exports = service.resolveWebpackConfig();
