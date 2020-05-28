@@ -56,13 +56,6 @@ module.exports = {
         portable: {
           artifactName: "${name}-${version}-${os}-${arch}-portable.${ext}"
         },
-        appx: {
-          applicationId: "OpenFlexureEV",
-          identityName: "60425J.T.Collins.OpenFlexureeV",
-          publisher: "CN=CC867BEF-0715-4D48-8035-8881993DBB68",
-          publisherDisplayName: "J. T. Collins",
-          backgroundColor: "#C5247F"
-        },
         linux: {
           target: [
             {
