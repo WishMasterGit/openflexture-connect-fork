@@ -63,4 +63,4 @@ deploy:
     - ssh -t ci-user@openflexure.bath.ac.uk "/var/www/build/update-latest.py"
     
   only:
-
+    - tags
