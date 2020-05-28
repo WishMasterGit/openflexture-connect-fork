@@ -1,4 +1,5 @@
 "use strict";
+/* global __static */
 
 import { app, protocol, BrowserWindow } from "electron";
 import {
