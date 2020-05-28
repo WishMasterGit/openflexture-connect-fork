@@ -1,3 +1,5 @@
+/* global __static */
+
 const { app, shell, Menu } = require("electron");
 const updater = require("electron-updater");
 const autoUpdater = updater.autoUpdater;
@@ -40,7 +42,7 @@ const template = [
         label: "About",
         click() {
           openAboutWindow({
-            icon_path: path.join(__dirname, "build/icon/png/512x512.png"),
+            icon_path: path.join(__static, "icon.png"),
             bug_report_url:
               "https://gitlab.com/openflexure/openflexure-connect/issues",
             homepage: "https://gitlab.com/openflexure/openflexure-connect"
