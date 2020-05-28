@@ -51,7 +51,7 @@ module.exports = {
           }
         ],
         win: {
-          target: ["appx", "NSIS"]
+          target: ["NSIS"]
         },
         appx: {
           applicationId: "OpenFlexureEV",
