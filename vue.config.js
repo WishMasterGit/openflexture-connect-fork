@@ -51,7 +51,10 @@ module.exports = {
           }
         ],
         win: {
-          target: ["NSIS"]
+          target: ["NSIS", "portable"]
+        },
+        portable: {
+          artifactName: "${name}-${version}-${os}-${arch}-portable.${ext}"
         },
         appx: {
           applicationId: "OpenFlexureEV",
