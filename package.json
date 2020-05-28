@@ -1,6 +1,6 @@
 {
-  "name": "openflexure-ev",
-  "version": "2.1.2",
+  "name": "openflexure-connect",
+  "version": "2.2.0-alpha",
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope Server",
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
@@ -11,9 +11,8 @@
   "license": "GNU General Public License v3.0 ",
   "main": "./app/app.js",
   "scripts": {
-    "build:web": "vue-cli-service build --mode production.web",
-    "build:app": "vue-cli-service build --mode production.app",
-    "serve:web": "vue-cli-service serve  --mode development.web",
+    "build": "vue-cli-service build --mode production.app",
+    "serve": "vue-cli-service serve  --mode development.web",
     "start": "npm run build:app && electron app/app.js",
     "dist:linux": "electron-builder --linux --config app/builder-config-x86_64.yaml",
     "dist:raspi": "electron-builder --linux --config app/builder-config-raspi.yaml",
