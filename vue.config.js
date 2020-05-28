@@ -51,8 +51,7 @@ module.exports = {
           }
         ],
         win: {
-          target: ["appx", "NSIS"],
-          icon: "build/icon/win/icon.ico"
+          target: ["appx", "NSIS"]
         },
         appx: {
           applicationId: "OpenFlexureEV",
@@ -68,11 +67,9 @@ module.exports = {
               arch: ["x64", "armv7l"]
             }
           ],
-          icon: "build/icon/png/",
           category: "Science"
         },
         mac: {
-          icon: "build/icon/mac/icon.icns",
           category: "public.app-category.utilities"
         },
         dmg: {
