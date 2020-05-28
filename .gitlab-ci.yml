@@ -27,6 +27,7 @@ build:
     paths:
       - "./dist_electron/*.AppImage"
       - "./dist_electron/*.exe"
+      - "./dist_electron/*.appx"
       - "./dist_electron/*.exe.blockmap"
       - "./dist_electron/latest*.yml"
       - "./dist_electron/beta*.yml"
