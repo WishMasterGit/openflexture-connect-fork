@@ -8,7 +8,7 @@
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "vue-cli-service electron:serve",
     "electron:release": "vue-cli-service electron:build -wl",
-    "make-icons": "electron-icon-builder --input=./app/icons/icon_base.png --output=./app/",
+    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
