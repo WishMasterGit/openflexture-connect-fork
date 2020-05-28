@@ -9,7 +9,8 @@
     "electron:serve": "vue-cli-service electron:serve",
     "make-icons": "electron-icon-builder --input=./app/icons/icon_base.png --output=./app/",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "release": "vue-cli-service electron:build -wl"
   },
   "dependencies": {
     "about-window": "^1.13.2",
