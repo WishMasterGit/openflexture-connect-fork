@@ -28,8 +28,6 @@ Vue.mixin({
       localStorage.setItem(keyName, parsed);
     },
     modalConfirm: function(modalText) {
-      var context = this;
-
       var showModal = function(resolve, reject) {
         UIkit.modal.confirm(modalText, { stack: true }).then(
           function() {

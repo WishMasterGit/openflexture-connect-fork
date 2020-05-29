@@ -125,10 +125,14 @@
 </template>
 
 <script>
+/* global __static */
+
 // Import mDNS package if running in Electron
 var mdns = require("mdns-js");
 const { BrowserWindow } = require("electron").remote;
+const path = require("path");
 
+import buildRemoteMenu from "../remoteMenu.js";
 import axios from "axios";
 import hostCard from "./connectComponents/hostCard.vue";
 
@@ -231,8 +235,6 @@ export default {
         if (typeof data.port !== "undefined" && validDevice === true) {
           this.$set(this.foundHosts, hostData.hostname, hostData);
         }
-
-        //console.log(this.foundHosts);
       });
     }
   },
@@ -248,7 +250,16 @@ export default {
           // If the /api/v2 route is available
           if (Object.keys(response.data).includes("/api/v2/")) {
             console.log("API v2 available");
-            let win = new BrowserWindow({ width: 1200, height: 900 });
+            let win = new BrowserWindow({
+              width: 1200,
+              height: 900,
+              icon: path.join(__static, "icon.png")
+            });
+            win.setMenu(
+              buildRemoteMenu(
+                "https://gitlab.com/openflexure/openflexure-microscope-jsclient"
+              )
+            );
             win.loadURL(this.selectedHostURL);
           } else {
             // Error and no-connect if API v2 is missing

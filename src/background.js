@@ -6,6 +6,7 @@ import {
   createProtocol,
   installVueDevtools
 } from "vue-cli-plugin-electron-builder/lib";
+const contextMenu = require("electron-context-menu");
 const { dialog } = require("electron");
 const path = require("path");
 const updater = require("electron-updater");
@@ -13,12 +14,24 @@ const autoUpdater = updater.autoUpdater;
 const ProgressBar = require("electron-progressbar");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
+contextMenu({
+  showInspectElement: true,
+  prepend: () => [
+    {
+      role: "zoomIn"
+    },
+    {
+      role: "zoomOut"
+    }
+  ]
+});
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
 
 // Set the application menu
-require("./menu.js");
+require("./appMenu.js");
 
 // Auto upadater
 autoUpdater.autoDownload = false;
@@ -32,7 +45,7 @@ autoUpdater.on("update-available", function(info) {
     {
       type: "info",
       title: "Update available",
-      message: "A new version of OpenFlexure eV is available.",
+      message: "A new version of OpenFlexure Connect is available.",
       buttons: ["Download", "Later"]
     },
     buttonIndex => {
@@ -127,7 +140,8 @@ function createWindow() {
     height: 900,
     icon: path.join(__static, "icon.png"),
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      enableRemoteModule: true
     }
   });
 

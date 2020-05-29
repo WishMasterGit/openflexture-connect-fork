@@ -18,7 +18,7 @@ module.exports = {
         },
         appId: "org.openflexure.ev",
         artifactName: "${name}-${version}-${os}-${arch}.${ext}",
-        asar: true,
+        asar: false,
         publish: [
           {
             provider: "generic",
@@ -40,12 +40,7 @@ module.exports = {
               "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
               "!**/{appveyor.yml,.travis.yml,circle.yml}",
               "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
-              "!**/.env.*",
               "!**/{.idea,.vscode}${/*}",
-              "!**/app/installers${/*}",
-              "!**/hooks${/*}",
-              "!**/platforms${/*}",
-              "!**/release-builds${/*}",
               "!src${/*}"
             ]
           }

@@ -5,8 +5,6 @@ const updater = require("electron-updater");
 const autoUpdater = updater.autoUpdater;
 const path = require("path");
 
-const openAboutWindow = require("about-window").default;
-
 const template = [
   {
     label: "Edit",
@@ -49,7 +47,16 @@ const template = [
             }
           });
           win.setMenuBarVisibility(false);
-          win.loadURL("app://./legacy/ev-121/index.html");
+          if (process.env.WEBPACK_DEV_SERVER_URL) {
+            // Load the url of the dev server if in development mode
+            win.loadURL(
+              process.env.WEBPACK_DEV_SERVER_URL + "/legacy/ev-121/index.html"
+            );
+            if (!process.env.IS_TEST) win.webContents.openDevTools();
+          } else {
+            // Load the index.html when not in development
+            win.loadURL("app://./legacy/ev-121/index.html");
+          }
         }
       }
     ]
@@ -58,20 +65,17 @@ const template = [
     role: "help",
     submenu: [
       {
-        label: "About",
-        click() {
-          openAboutWindow({
-            icon_path: path.join(__static, "icon.png"),
-            bug_report_url:
-              "https://gitlab.com/openflexure/openflexure-connect/issues",
-            homepage: "https://gitlab.com/openflexure/openflexure-connect"
-          });
-        }
-      },
-      {
         label: "Homepage",
         click() {
           shell.openExternal("https://openflexure.org");
+        }
+      },
+      {
+        label: "Report an issue",
+        click() {
+          shell.openExternal(
+            "https://gitlab.com/openflexure/openflexure-connect/issues"
+          );
         }
       },
       { type: "separator" },

@@ -10,10 +10,10 @@
     "electron:release": "vue-cli-service electron:build -wl",
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "postuninstall": "electron-builder install-app-deps",
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "about-window": "^1.13.2",
     "electron-context-menu": "^2.0.1",
     "electron-progressbar": "^1.2.0",
     "electron-store": "^5.1.1",
@@ -21,13 +21,11 @@
     "material-design-icons": "^3.0.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.4.1",
+    "@vue/cli-plugin-eslint": "^4.4.0",
     "@vue/cli-service": "^4.4.1",
     "axios": "^0.19.2",
-    "babel-eslint": "^10.1.0",
     "css-loader": "^3.5.3",
     "electron": "^9.0.0",
-    "electron-builder": "^22.7.0",
     "electron-icon-builder": "^1.0.2",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
@@ -36,7 +34,7 @@
     "less": "^3.11.1",
     "less-loader": "^6.1.0",
     "mdns-js": "^1.0.3",
-    "uikit": "^3.5.0",
+    "uikit": "^3.5.2",
     "vue": "^2.6.11",
     "vue-cli-plugin-electron-builder": "^1.4.6",
     "vue-template-compiler": "^2.6.11"
@@ -51,13 +49,10 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "displayName": "OpenFlexure eV",
-  "homepage": "https://gitlab.com/openflexure/openflexure-microscope-jsclient",
+  "displayName": "OpenFlexure Connect",
+  "homepage": "https://gitlab.com/openflexure/openflexure-connect",
   "license": "GNU General Public License v3.0 ",
   "main": "background.js",
-  "optionalDependencies": {
-    "electron-windows-store": "^2.1.0"
-  },
-  "productName": "OpenFlexure eV",
-  "publisher": "Bath Open Instrumentation Group"
+  "productName": "OpenFlexure Connect",
+  "publisher": "OpenFlexure.org"
 }
