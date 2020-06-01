@@ -26,6 +26,7 @@
     "axios": "^0.19.2",
     "css-loader": "^3.5.3",
     "electron": "^9.0.0",
+    "electron-builder": "^22.7.0",
     "electron-icon-builder": "^1.0.2",
     "eslint": "^7.1.0",
     "eslint-config-prettier": "^6.11.0",
