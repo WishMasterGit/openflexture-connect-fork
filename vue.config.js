@@ -18,7 +18,7 @@ module.exports = {
         },
         appId: "org.openflexure.ev",
         artifactName: "${name}-${version}-${os}-${arch}.${ext}",
-        asar: false,
+        asar: true,
         publish: [
           {
             provider: "generic",
