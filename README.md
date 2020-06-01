@@ -15,7 +15,7 @@ A general guide on setting up your microscope, including OpenFlexure eV, can be 
 * Binaries will be built for testing on merge requests, and manual CI triggers
     * These builds expire after a week, and are intended for testing only.
 
-* Binaries will be built **and deployed** when a merge into `stable` completes.
+* Binaries will be built **and deployed** on release tags.
     * These binaries will expire on GitLab after a week, but will be permanantly
     deployed to http://build.openflexure.org/openflexure-ev
 
