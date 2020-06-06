@@ -28,7 +28,11 @@ var manifest = {
     {
       Arch: "x64",
       Url: installerUrl,
-      Sha256: installerChecksum
+      Sha256: installerChecksum,
+      Switches: {
+        Silent: "/S",
+        SilentWithProgress: "/S"
+      }
     }
   ]
 };
