@@ -32,6 +32,7 @@ build:
       - "./dist_electron/*.appx"
       - "./dist_electron/*.exe.blockmap"
       - "./dist_electron/*.yml"
+      - "./dist_electron/*.yaml"
 
   only:
     - merge_requests
