@@ -20,6 +20,8 @@ build:
     - npm install
     # Build electron app
     - npm run electron:release
+    # Make release manifests
+    - npm run makemanifests
 
   artifacts:
     name: "dist_electron"
@@ -29,8 +31,7 @@ build:
       - "./dist_electron/*.exe"
       - "./dist_electron/*.appx"
       - "./dist_electron/*.exe.blockmap"
-      - "./dist_electron/latest*.yml"
-      - "./dist_electron/beta*.yml"
+      - "./dist_electron/*.yml"
 
   only:
     - merge_requests

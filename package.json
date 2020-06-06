@@ -1,5 +1,7 @@
 {
   "name": "openflexure-connect",
+  "publisher": "OpenFlexure",
+  "productName": "OpenFlexure Connect",
   "version": "3.0.0-beta",
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope Server",
@@ -11,7 +13,8 @@
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "makemanifests": "node ./genWingetManifest.js"
   },
   "dependencies": {
     "electron-context-menu": "^2.0.1",
@@ -35,10 +38,12 @@
     "less": "^3.11.1",
     "less-loader": "^6.1.0",
     "mdns-js": "^1.0.3",
+    "sha256-file": "^1.0.0",
     "uikit": "^3.5.2",
     "vue": "^2.6.11",
     "vue-cli-plugin-electron-builder": "^1.4.6",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.11",
+    "yaml": "^1.10.0"
   },
   "postcss": {
     "plugins": {
@@ -50,10 +55,7 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "displayName": "OpenFlexure Connect",
   "homepage": "https://gitlab.com/openflexure/openflexure-connect",
   "license": "GNU General Public License v3.0 ",
-  "main": "background.js",
-  "productName": "OpenFlexure Connect",
-  "publisher": "OpenFlexure.org"
+  "main": "background.js"
 }
