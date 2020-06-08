@@ -5,6 +5,8 @@ const updater = require("electron-updater");
 const autoUpdater = updater.autoUpdater;
 const path = require("path");
 
+const openAboutWindow = require("about-window").default;
+
 const template = [
   {
     label: "Edit",
@@ -65,10 +67,18 @@ const template = [
     role: "help",
     submenu: [
       {
-        label: "Homepage",
-        click() {
-          shell.openExternal("https://openflexure.org");
-        }
+        label: "About",
+        click: () =>
+          openAboutWindow({
+            icon_path: path.join(__static, "icon.png"),
+            about_page_dir: path.join(__static, "about"),
+            package_json_dir: __dirname,
+            use_version_info: true,
+            homepage: "https://gitlab.com/openflexure/openflexure-connect",
+            bug_report_url:
+              "https://gitlab.com/openflexure/openflexure-connect/issues",
+            license: "GNU General Public License v3.0"
+          })
       },
       {
         label: "Report an issue",
