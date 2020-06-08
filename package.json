@@ -8,6 +8,8 @@
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
   "scripts": {
     "electron:build": "vue-cli-service electron:build",
+    "electron:build:lin": "vue-cli-service electron:build -l",
+    "electron:build:win": "vue-cli-service electron:build -w",
     "electron:serve": "vue-cli-service electron:serve",
     "electron:release": "vue-cli-service electron:build -wl",
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",

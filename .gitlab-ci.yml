@@ -1,3 +1,9 @@
+.shared_windows_runners:
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+
 stages:
   - build
   - deploy
@@ -14,20 +20,44 @@ cache:
 build:
   stage: build
   image: electronuserland/builder:wine
- 
+
   script:
     # Install node dependencies
     - npm install
     # Build electron app
     - npm run electron:release
-    # Make release manifests
-    - npm run makemanifests
 
   artifacts:
     name: "dist_electron"
     expire_in: 1 week
     paths:
       - "./dist_electron/*.AppImage"
+      - "./dist_electron/*.yml"
+      - "./dist_electron/*.yaml"
+
+  only:
+    - merge_requests
+    - master
+    - web
+    - tags
+
+build-win:
+  stage: build
+  extends:
+  - .shared_windows_runners
+
+  script:
+    # Install node dependencies
+    - npm install
+    # Build electron app
+    - npm run electron:build:win
+    # Make winget manifests
+    - npm run makemanifests
+
+  artifacts:
+    name: "dist_electron"
+    expire_in: 1 week
+    paths:
       - "./dist_electron/*.exe"
       - "./dist_electron/*.appx"
       - "./dist_electron/*.exe.blockmap"
