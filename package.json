@@ -2,7 +2,7 @@
   "name": "openflexure-connect",
   "publisher": "OpenFlexure",
   "productName": "OpenFlexure Connect",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0-beta.2",
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope Server",
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
