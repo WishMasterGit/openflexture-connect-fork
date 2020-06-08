@@ -17,6 +17,7 @@
     "makemanifests": "node ./genWingetManifest.js"
   },
   "dependencies": {
+    "about-window": "^1.13.4",
     "electron-context-menu": "^2.0.1",
     "electron-progressbar": "^1.2.0",
     "electron-store": "^5.2.0",
