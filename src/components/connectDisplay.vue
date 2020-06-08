@@ -1,126 +1,114 @@
 <template>
-  <div class="connectDisplay uk-padding uk-padding-remove-left">
+  <div class="connectDisplay uk-padding">
     <div
-      uk-grid
-      class="uk-height-1-1 uk-margin-remove uk-padding-remove uk-flex-column"
-      margin="0"
+      id="new-connection-card"
+      class="uk-card uk-card-default uk-padding-remove uk-width-medium connect-card-align-top"
     >
-      <div class="uk-width-auto">
-        <div
-          id="new-connection-card"
-          class="uk-card uk-card-default uk-padding-remove uk-width-medium connect-card-align-top"
-        >
-          <div class="uk-card-body uk-padding-small">
-            <form id="formConnectToHost" @submit.prevent="handleSubmit">
-              <div class="uk-form-controls uk-margin">
-                <label
-                  ><input
-                    v-model="computedLocalMode"
-                    class="uk-radio"
-                    type="radio"
-                    name="radio_local"
-                    :value="true"
-                  />
-                  Connect locally</label
-                ><br />
-                <label
-                  ><input
-                    v-model="computedLocalMode"
-                    class="uk-radio"
-                    type="radio"
-                    name="radio_local"
-                    :value="false"
-                    checked
-                  />
-                  Connect remotely</label
-                >
-              </div>
-              <div v-if="!localMode">
-                <div class="uk-inline uk-width-1-1">
-                  <span class="uk-form-icon"
-                    ><i class="material-icons">dns</i></span
-                  >
-                  <input
-                    v-model="hostname"
-                    class="uk-input uk-form-small"
-                    type="text"
-                    placeholder="Hostname or IP address"
-                  />
-                </div>
-                <label class="uk-form-label" for="form-stacked-text"
-                  >Port</label
-                >
-                <div class="uk-form-controls">
-                  <input
-                    id="form-stacked-text"
-                    v-model="computedPort"
-                    class="uk-input uk-form-small"
-                    type="number"
-                    value="5000"
-                  />
-                </div>
-              </div>
-            </form>
-          </div>
-
-          <div class="uk-card-footer uk-padding-small">
-            <button
-              type="submit"
-              form="formConnectToHost"
-              class="uk-button uk-button-primary uk-form-small uk-float-right uk-margin uk-margin-remove-top uk-width-1-1"
-              @click="handleSubmit"
+      <div class="uk-card-body uk-padding-small">
+        <form id="formConnectToHost" @submit.prevent="handleSubmit">
+          <div class="uk-form-controls uk-margin">
+            <label
+              ><input
+                v-model="computedLocalMode"
+                class="uk-radio"
+                type="radio"
+                name="radio_local"
+                :value="true"
+              />
+              Connect locally</label
+            ><br />
+            <label
+              ><input
+                v-model="computedLocalMode"
+                class="uk-radio"
+                type="radio"
+                name="radio_local"
+                :value="false"
+                checked
+              />
+              Connect remotely</label
             >
-              Connect
-            </button>
-
-            <button
-              class="uk-button uk-button-default uk-form-small uk-margin-small uk-width-1-1"
-              @click="saveHost()"
-            >
-              Save Current
-            </button>
           </div>
-        </div>
+          <div v-if="!localMode">
+            <div class="uk-inline uk-width-1-1">
+              <span class="uk-form-icon"
+                ><i class="material-icons">dns</i></span
+              >
+              <input
+                v-model="hostname"
+                class="uk-input uk-form-small"
+                type="text"
+                placeholder="Hostname or IP address"
+              />
+            </div>
+            <label class="uk-form-label" for="form-stacked-text">Port</label>
+            <div class="uk-form-controls">
+              <input
+                id="form-stacked-text"
+                v-model="computedPort"
+                class="uk-input uk-form-small"
+                type="number"
+                value="5000"
+              />
+            </div>
+          </div>
+        </form>
       </div>
 
-      <div class="uk-width-expand">
-        <ul uk-accordion="multiple: true; animation: false">
-          <li id="nearby-connections-grid" class="uk-open">
-            <a class="uk-accordion-title" href="#">Nearby devices</a>
-            <div class="uk-accordion-content">
-              <div class="uk-grid-medium uk-grid-match uk-margin-top" uk-grid>
-                <div v-for="host in foundHostArray" :key="host.name">
-                  <hostCard
-                    :name="host.name"
-                    :hostname="host.hostname"
-                    :port="host.port"
-                    :deletable="false"
-                    @connect="handleConnectButton(host)"
-                  ></hostCard>
-                </div>
-              </div>
-            </div>
-          </li>
+      <div class="uk-card-footer uk-padding-small">
+        <button
+          type="submit"
+          form="formConnectToHost"
+          class="uk-button uk-button-primary uk-form-small uk-float-right uk-margin uk-margin-remove-top uk-width-1-1"
+          @click="handleSubmit"
+        >
+          Connect
+        </button>
 
-          <li id="saved-connections-grid" class="uk-open">
-            <a class="uk-accordion-title" href="#">Saved devices</a>
-            <div class="uk-accordion-content">
-              <div class="uk-grid-medium uk-grid-match uk-margin-top" uk-grid>
-                <div v-for="host in savedHosts" :key="host.name">
-                  <hostCard
-                    :name="host.name"
-                    :hostname="host.hostname"
-                    :port="host.port"
-                    @connect="handleConnectButton(host)"
-                    @delete="delSavedHost(host)"
-                  ></hostCard>
-                </div>
-              </div>
-            </div>
-          </li>
-        </ul>
+        <button
+          class="uk-button uk-button-default uk-form-small uk-margin-small uk-width-1-1"
+          @click="saveHost()"
+        >
+          Save Current
+        </button>
       </div>
     </div>
+
+    <ul uk-accordion="multiple: true; animation: false">
+      <li id="nearby-connections-grid" class="uk-open">
+        <a class="uk-accordion-title" href="#">Nearby devices</a>
+        <div class="uk-accordion-content">
+          <div class="uk-grid-medium uk-grid-match" uk-grid>
+            <div v-for="host in foundHostArray" :key="host.name">
+              <hostCard
+                :name="host.name"
+                :hostname="host.hostname"
+                :port="host.port"
+                :deletable="false"
+                @connect="handleConnectButton(host)"
+              ></hostCard>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <li id="saved-connections-grid" class="uk-open">
+        <a class="uk-accordion-title" href="#">Saved devices</a>
+        <div class="uk-accordion-content">
+          <div class="uk-grid-medium uk-grid-match" uk-grid>
+            <div v-for="host in savedHosts" :key="host.name">
+              <hostCard
+                :name="host.name"
+                :hostname="host.hostname"
+                :port="host.port"
+                @connect="handleConnectButton(host)"
+                @delete="delSavedHost(host)"
+              ></hostCard>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
