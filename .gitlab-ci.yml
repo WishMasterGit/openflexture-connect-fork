@@ -25,7 +25,7 @@ build:
     # Install node dependencies
     - npm install
     # Build electron app
-    - npm run electron:release
+    - npm run electron:build:lin
 
   artifacts:
     name: "dist_electron"
