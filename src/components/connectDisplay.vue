@@ -60,7 +60,7 @@
         <button
           type="submit"
           form="formConnectToHost"
-          class="uk-button uk-button-primary uk-form-small uk-float-right uk-margin uk-margin-remove-top uk-width-1-1"
+          class="uk-button uk-button-primary uk-form-small uk-float-right uk-width-1-1"
           @click="handleSubmit"
         >
           Connect
