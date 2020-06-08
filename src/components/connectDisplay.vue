@@ -1,5 +1,6 @@
 <template>
   <div class="connectDisplay uk-padding">
+    <!-- New connection card (connect locally/remotely) -->
     <div
       id="new-connection-card"
       class="uk-card uk-card-default uk-padding-remove uk-width-medium connect-card-align-top"
@@ -74,6 +75,7 @@
       </div>
     </div>
 
+    <!-- Nearby devices -->
     <ul uk-accordion="multiple: true; animation: false">
       <li id="nearby-connections-grid" class="uk-open">
         <a class="uk-accordion-title" href="#">Nearby devices</a>
@@ -92,6 +94,7 @@
         </div>
       </li>
 
+      <!-- Saved devices -->
       <li id="saved-connections-grid" class="uk-open">
         <a class="uk-accordion-title" href="#">Saved devices</a>
         <div class="uk-accordion-content">
