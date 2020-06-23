@@ -14,16 +14,11 @@ const autoUpdater = updater.autoUpdater;
 const ProgressBar = require("electron-progressbar");
 const isDevelopment = process.env.NODE_ENV !== "production";
 
+// Make a context menu
 contextMenu({
-  showInspectElement: true,
-  prepend: () => [
-    {
-      role: "zoomIn"
-    },
-    {
-      role: "zoomOut"
-    }
-  ]
+  showCopyImageAddress: true,
+  showSaveImageAs: true,
+  showInspectElement: false
 });
 
 // Keep a global reference of the window object, if you don't, the window will
