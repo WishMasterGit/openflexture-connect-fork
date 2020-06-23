@@ -6,7 +6,7 @@
       class="uk-card uk-card-default uk-padding-remove uk-width-medium connect-card-align-top"
     >
       <div class="uk-card-body uk-padding-small">
-        <form id="formConnectToHost" @submit.prevent="handleSubmit">
+        <form id="formConnectToHost" @submit.prevent>
           <div class="uk-form-controls uk-margin">
             <label
               ><input
@@ -15,6 +15,7 @@
                 type="radio"
                 name="radio_local"
                 :value="true"
+                checked
               />
               Connect locally</label
             ><br />
@@ -25,7 +26,6 @@
                 type="radio"
                 name="radio_local"
                 :value="false"
-                checked
               />
               Connect remotely</label
             >
@@ -123,8 +123,8 @@ var mdns = require("mdns-js");
 const { BrowserWindow } = require("electron").remote;
 const path = require("path");
 
-import buildRemoteMenu from "../remoteMenu.js";
 import axios from "axios";
+import remoteMenu from "../remoteMenu.js";
 import hostCard from "./connectComponents/hostCard.vue";
 
 // Export main app
@@ -246,11 +246,7 @@ export default {
               height: 900,
               icon: path.join(__static, "icon.png")
             });
-            win.setMenu(
-              buildRemoteMenu(
-                "https://gitlab.com/openflexure/openflexure-microscope-jsclient"
-              )
-            );
+            win.setMenu(remoteMenu);
             win.loadURL(this.selectedHostURL);
           } else {
             // Error and no-connect if API v2 is missing
