@@ -3,13 +3,6 @@ stages:
   - deploy
 
 
-# Cache modules in between jobs
-cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-  - node_modules/
-
-
 # Electron app build
 build:
   stage: build
