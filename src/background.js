@@ -35,21 +35,22 @@ autoUpdater.on("checking-for-update", function() {});
 
 autoUpdater.on("update-available", function(info) {
   console.log("Update available." + info);
-  dialog.showMessageBox(
-    win,
-    {
+  dialog
+    .showMessageBox(win, {
       type: "info",
       title: "Update available",
       message: "A new version of OpenFlexure Connect is available.",
       buttons: ["Download", "Later"]
-    },
-    buttonIndex => {
-      if (buttonIndex === 0) {
+    })
+    .then(input => {
+      if (input.response === 0) {
         console.log("Downloading update selected");
         handleDownloadUpdate();
       }
-    }
-  );
+    })
+    .catch(error => {
+      console.log(error);
+    });
 });
 
 // Download, with a progress bar
@@ -85,20 +86,21 @@ function handleDownloadUpdate() {
 // Trigger update installation
 autoUpdater.on("update-downloaded", function(info) {
   console.log("Update downloaded." + info);
-  dialog.showMessageBox(
-    win,
-    {
+  dialog
+    .showMessageBox(win, {
       type: "info",
       title: "Update downloaded",
       message: "Please restart the application to apply the update.",
       buttons: ["Update", "Later"]
-    },
-    buttonIndex => {
-      if (buttonIndex === 0) {
+    })
+    .then(input => {
+      if (input.response === 0) {
         autoUpdater.quitAndInstall();
       }
-    }
-  );
+    })
+    .catch(error => {
+      console.log(error);
+    });
 });
 
 autoUpdater.on("update-not-available", function() {
@@ -157,8 +159,6 @@ function createWindow() {
     createProtocol("app");
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
-    // Check for updates when not in development
-    autoUpdater.checkForUpdates();
   }
 
   win.on("closed", () => {
