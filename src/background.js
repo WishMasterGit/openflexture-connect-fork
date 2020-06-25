@@ -102,11 +102,20 @@ autoUpdater.on("update-downloaded", function(info) {
 });
 
 autoUpdater.on("update-not-available", function() {
-  console.log("Update not available.");
+  dialog.showMessageBox(win, {
+    type: "info",
+    title: "No updates available",
+    message: "You are on the latest version of OpenFlexure Connect."
+  });
 });
 
 autoUpdater.on("error", function() {
-  console.log("Error in auto-updater.");
+  dialog.showMessageBox(win, {
+    type: "info",
+    title: "Error checking for updates",
+    message:
+      "Error checking for updates. Make sure your device is connected to the internet."
+  });
 });
 
 autoUpdater.on("download-progress", function(progressObj) {
