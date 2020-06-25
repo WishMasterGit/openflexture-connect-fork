@@ -1,6 +1,15 @@
+## [3.0.2](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.1...v3.0.2) (2020-06-25)
+
+
+* Fixed update flow and removed startup check ([33f4e9f](https://gitlab.com/openflexure/openflexure-connect/commit/33f4e9f))
+* Stop building on every branch commit ([c95d2a0](https://gitlab.com/openflexure/openflexure-connect/commit/c95d2a0))
+* Updated changelog ([f2732f5](https://gitlab.com/openflexure/openflexure-connect/commit/f2732f5))
+
+
 ## [3.0.1](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.0...v3.0.1) (2020-06-25)
 
 
+* 3.0.1 ([9c3a663](https://gitlab.com/openflexure/openflexure-connect/commit/9c3a663))
 * Added changelog builder ([479c7a2](https://gitlab.com/openflexure/openflexure-connect/commit/479c7a2))
 * Added logic to hide found hosts that go missing ([bcbc18d](https://gitlab.com/openflexure/openflexure-connect/commit/bcbc18d))
 * Added messages for error or no updates ([96dfd57](https://gitlab.com/openflexure/openflexure-connect/commit/96dfd57))
