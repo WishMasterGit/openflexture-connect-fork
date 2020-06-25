@@ -1,10 +1,12 @@
 <template>
   <div
+    v-show="shouldShow"
     class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium"
   >
     <div class="uk-card-media-top">
       <div class="snapshot-container uk-width-1-1 uk-height-auto">
         <img
+          v-show="snapshotAvailable"
           class="uk-width-1-1"
           :data-src="snapshotSrc"
           :src="snapshotSrc"
@@ -12,7 +14,7 @@
           height="225"
         />
         <div
-          v-if="!snapshotAvailable"
+          v-show="!snapshotAvailable"
           class="uk-position-cover uk-flex uk-flex-center uk-flex-middle"
         >
           Snapshot unavailable
@@ -75,6 +77,11 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    hideIfUnavailable: {
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
 
@@ -93,6 +100,13 @@ export default {
     },
     snapshotURL: function() {
       return `http://${this.hostname}:${this.port}${this.snapshotRule}`;
+    },
+    shouldShow: function() {
+      if (this.hideIfUnavailable && !this.snapshotAvailable) {
+        return false;
+      } else {
+        return true;
+      }
     }
   },
 
@@ -120,7 +134,7 @@ export default {
           // If the host has a snapshot route available
           if (this.snapshotRule in response.data) {
             // Tell the view that a snapshot is available
-            this.snapshotAvailable = true;
+            this.setAvailability(true);
             // Update the snapshot URL
             this.updateSnapshotURL();
             // If not already polling, start polling
@@ -131,14 +145,25 @@ export default {
         })
         .catch(() => {
           // Tell the view that a snapshot is not available, and ignore
-          this.snapshotAvailable = false;
+          this.setAvailability(false);
         });
     },
 
     updateSnapshotURL: function() {
       // Set the snapshot image src to the snapshot URL,
       // adding a timestamp argument to act as a cache-breaker
-      this.snapshotSrc = `${this.snapshotURL}?${Date.now()}`;
+      var candidatesnapshotSrc = `${this.snapshotURL}?${Date.now()}`;
+
+      axios
+        .head(candidatesnapshotSrc)
+        .then(() => {
+          this.setAvailability(true);
+          this.snapshotSrc = candidatesnapshotSrc;
+        })
+        .catch(() => {
+          console.log("Snapshot unavailable");
+          this.setAvailability(false);
+        });
     },
 
     updateSnapshotPoll: function() {
@@ -146,6 +171,15 @@ export default {
       this.polling = setInterval(() => {
         this.updateSnapshotURL();
       }, 15000);
+    },
+
+    setAvailability: function(availability) {
+      this.snapshotAvailable = availability;
+      if (availability === true) {
+        this.$emit("available");
+      } else {
+        this.$emit("unavailable");
+      }
     }
   }
 };
@@ -159,6 +193,8 @@ export default {
 
 .snapshot-container {
   position: relative;
+  width: 300px;
+  height: 225px;
 }
 
 img[data-src][src*="data:image"] {

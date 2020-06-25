@@ -104,6 +104,7 @@
                 :name="host.name"
                 :hostname="host.hostname"
                 :port="host.port"
+                :hide-if-unavailable="false"
                 @connect="handleConnectButton(host)"
                 @delete="delSavedHost(host)"
               ></hostCard>
@@ -217,13 +218,16 @@ export default {
           }
         });
 
-        var hostData = {
-          hostname: data.addresses[0],
-          name: `${data.host} on ${data.networkInterface}`,
-          port: data.port
-        };
+        if (validDevice === true) {
+          console.log(data);
+        }
 
         if (typeof data.port !== "undefined" && validDevice === true) {
+          var hostData = {
+            hostname: data.addresses[0],
+            name: `${data.host} on ${data.networkInterface}`,
+            port: data.port
+          };
           this.$set(this.foundHosts, hostData.hostname, hostData);
         }
       });
@@ -286,12 +290,8 @@ export default {
       this.connectToSelectedHost();
     },
 
-    delSavedHost: function(host) {
-      console.log(host);
-      var index = this.savedHosts.indexOf(host);
-      if (index > -1) {
-        this.savedHosts.splice(index, 1);
-      }
+    hideSavedHost: function(host) {
+      this.foundHosts(host.hostname);
     },
 
     saveHost: function() {
@@ -305,7 +305,7 @@ export default {
           // We use unshift instead of push to add the entry to the beginning of the array
           this.savedHosts.unshift({
             name: deviceName,
-            hostname: this.host,
+            hostname: this.hostname,
             port: this.port
           });
         })
