@@ -1,3 +1,13 @@
+## [3.0.1](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.0...v3.0.1) (2020-06-25)
+
+
+* Added changelog builder ([479c7a2](https://gitlab.com/openflexure/openflexure-connect/commit/479c7a2))
+* Added logic to hide found hosts that go missing ([bcbc18d](https://gitlab.com/openflexure/openflexure-connect/commit/bcbc18d))
+* Added messages for error or no updates ([96dfd57](https://gitlab.com/openflexure/openflexure-connect/commit/96dfd57))
+* Fixed overflow scrolling ([439bf28](https://gitlab.com/openflexure/openflexure-connect/commit/439bf28))
+* Remove node_modules cache ([31f1cf7](https://gitlab.com/openflexure/openflexure-connect/commit/31f1cf7))
+
+
 # [3.0.0](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.0-beta.2...v3.0.0) (2020-06-24)
 
 
