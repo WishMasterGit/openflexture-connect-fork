@@ -29,7 +29,6 @@ build:
 
   only:
     - merge_requests
-    - master
     - web
     - tags
 
