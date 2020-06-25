@@ -1,4 +1,4 @@
-# OpenFlexure Connect (Formerly OpenFlexure eV)
+# OpenFlexure Connect 
 [![pipeline status](https://gitlab.com/openflexure/openflexure-microscope-jsclient/badges/master/pipeline.svg?style=flat-square)](https://gitlab.com/openflexure/openflexure-microscope-jsclient/commits/master)
 
 A user client for the OpenFlexure Microscope, written in Vue.js.
@@ -47,3 +47,8 @@ To prevent the editor from interfering with ESLint, add to your project `setting
     "vetur.validation.template": false
 }
 ```
+
+### Changelogs
+
+* `npm install -g conventional-changelog-cli`
+* `conventional-changelog -r 0 --config ./changelog.config.js -i CHANGELOG.md -s`
