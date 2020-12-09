@@ -5,6 +5,11 @@
 A general user-guide on setting up your microscope can be found [**here on our website**](https://www.openflexure.org/projects/microscope/).
 This includes basic installation instructions suitable for most users.
 
+## Key info
+
+* An [Electron](https://www.electronjs.org/) app that handles auto-discovery (via mDNS), saving connections, etc.
+* When you connect to a microscope, it just opens a new Electron window pointing to the server root, where the JS client is hosted.
+
 # Developer guidelines
 
 ## Creating releases
