@@ -1,6 +1,6 @@
 /* global __static */
 
-const { app, shell, Menu } = require("electron");
+const { app, shell, Menu, BrowserWindow } = require("electron");
 const updater = require("electron-updater");
 const autoUpdater = updater.autoUpdater;
 const path = require("path");
@@ -33,7 +33,35 @@ const template = [
   },
   {
     role: "window",
-    submenu: [{ role: "minimize" }, { role: "close" }]
+    submenu: [
+      { role: "minimize" },
+      { role: "close" },
+      { type: "separator" },
+      {
+        label: "Launch legacy mode",
+        click() {
+          let win = new BrowserWindow({
+            width: 1200,
+            height: 900,
+            icon: path.join(__static, "icon.png"),
+            webPreferences: {
+              nodeIntegration: true
+            }
+          });
+          win.setMenuBarVisibility(false);
+          if (process.env.WEBPACK_DEV_SERVER_URL) {
+            // Load the url of the dev server if in development mode
+            win.loadURL(
+              process.env.WEBPACK_DEV_SERVER_URL + "/legacy/ev-121/index.html"
+            );
+            if (!process.env.IS_TEST) win.webContents.openDevTools();
+          } else {
+            // Load the index.html when not in development
+            win.loadURL("app://./legacy/ev-121/index.html");
+          }
+        }
+      }
+    ]
   },
   {
     role: "help",
