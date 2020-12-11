@@ -9,6 +9,7 @@
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "electron:release": "vue-cli-service electron:build -wl",
     "electron:serve": "vue-cli-service electron:serve",
+    "lint": "vue-cli-service lint --no-fix",
     "lint:fix": "vue-cli-service lint --fix",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
