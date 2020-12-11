@@ -33,7 +33,7 @@ eslint:
 build:
   stage: build
   dependencies:
-    - analysis
+    - eslint
   image: electronuserland/builder:wine
 
   <<: *node-install
