@@ -258,7 +258,6 @@ export default {
       let selectedHostURL = this.buildHostURL(host.hostname, host.port);
       // Start the connecting spinner
       UIkit.modal("#connecting-modal").show();
-      // TODO: Connecting spinner
       axios
         .get(`${selectedHostURL}/routes`)
         .finally(() => {
