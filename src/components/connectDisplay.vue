@@ -150,7 +150,7 @@ export default {
   data: function() {
     return {
       localMode: true,
-      hostname: "localhost",
+      hostname: "microscope.local",
       port: 5000,
       savedHosts: [],
       foundHosts: {}
