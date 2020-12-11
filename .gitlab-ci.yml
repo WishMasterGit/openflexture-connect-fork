@@ -7,14 +7,12 @@ stages:
 build:
   stage: build
   image: electronuserland/builder:wine
- 
+
   script:
     # Install node dependencies
     - npm install
     # Build electron app
     - npm run electron:release
-    # Make release manifests
-    - npm run makemanifests
 
   artifacts:
     name: "dist_electron"
