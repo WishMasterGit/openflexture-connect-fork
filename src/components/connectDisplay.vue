@@ -144,44 +144,44 @@ export default {
   name: "ConnectDisplay",
 
   components: {
-    hostCard,
+    hostCard
   },
 
-  data: function () {
+  data: function() {
     return {
       localMode: true,
       hostname: "microscope.local",
       port: 5000,
       savedHosts: [],
-      foundHosts: {},
+      foundHosts: {}
     };
   },
 
   computed: {
-    selectedHostURL: function () {
+    selectedHostURL: function() {
       return `http://${this.hostname}:${this.port}`;
     },
-    foundHostArray: function () {
+    foundHostArray: function() {
       return Object.values(this.foundHosts);
     },
-    savedHostNames: function () {
+    savedHostNames: function() {
       var hostnames = [];
       for (var host of this.savedHosts) {
         hostnames.push(host.hostname);
       }
       return hostnames;
     },
-    manualIPValid: function () {
+    manualIPValid: function() {
       const addr = ipaddr.isValid(this.hostname);
       return addr;
-    },
+    }
   },
 
   // When savedHosts changes, serialise to JSON and save to localStorage
   watch: {
     savedHosts() {
       this.setLocalStorageObj("savedHosts", this.savedHosts);
-    },
+    }
   },
 
   mounted() {
@@ -196,16 +196,16 @@ export default {
     var browser = mdns.createBrowser(mdns.tcp("openflexure"));
 
     // Start discovering services when ready
-    browser.on("ready", function () {
+    browser.on("ready", function() {
       browser.discover();
     });
 
-    browser.on("update", (data) => {
+    browser.on("update", data => {
       // We will be checking if it's a valid openflexure device
       var validDevice = false;
 
       // Go through each type of the host, make valid if 'openflexure' appears
-      data.type.forEach((element) => {
+      data.type.forEach(element => {
         //console.log(element);
         if (element.name === "openflexure") {
           validDevice = true;
@@ -220,7 +220,7 @@ export default {
         var hostData = {
           hostname: data.addresses[0],
           name: `${data.host} on ${data.networkInterface}`,
-          port: data.port,
+          port: data.port
         };
         this.$set(this.foundHosts, hostData.hostname, hostData);
       }
@@ -228,7 +228,7 @@ export default {
   },
 
   methods: {
-    getManualHost: function () {
+    getManualHost: function() {
       // Get the currently selected host object from the manual connect box
       let hostname = this.hostname;
       let port = this.port;
@@ -239,7 +239,7 @@ export default {
       return { hostname: hostname, port: port };
     },
 
-    buildHostURL: function (hostname, port) {
+    buildHostURL: function(hostname, port) {
       // IPv6-based URLs have to be wrapped in [] when specifying a port
       if (ipaddr.isValid(hostname)) {
         if (ipaddr.parse(hostname).kind() == "ipv6") {
@@ -249,7 +249,7 @@ export default {
       return `http://${hostname}:${port}`;
     },
 
-    connectHost: function (host) {
+    connectHost: function(host) {
       // Set the remote connect box values
       this.localMode = false;
       this.hostname = host.hostname;
@@ -263,14 +263,14 @@ export default {
         .finally(() => {
           UIkit.modal("#connecting-modal").hide();
         })
-        .then((response) => {
+        .then(response => {
           // If the /api/v2 route is available
           if (Object.keys(response.data).includes("/api/v2/")) {
             console.log("API v2 available");
             let win = new BrowserWindow({
               width: 1200,
               height: 893,
-              icon: path.join(__static, "icon.png"),
+              icon: path.join(__static, "icon.png")
             });
             win.setMenu(remoteMenu);
             win.loadURL(selectedHostURL);
@@ -285,12 +285,12 @@ export default {
             this.modalDialog("API upgrade required", ApiVersionError);
           }
         })
-        .catch((error) => {
+        .catch(error => {
           this.modalError(error); // Let mixin handle error
         });
     },
 
-    removeHost: function (host) {
+    removeHost: function(host) {
       console.log(host);
       var index = this.savedHosts.indexOf(host);
       if (index > -1) {
@@ -298,7 +298,7 @@ export default {
       }
     },
 
-    saveHost: function (host) {
+    saveHost: function(host) {
       // Check if we already saved this host
       if (!this.savedHostNames.includes(host.hostname)) {
         // Generate the host URL
@@ -307,22 +307,22 @@ export default {
         var hostnameUri = `${selectedHostURL}/api/v2/instrument/settings/name`;
         axios
           .get(hostnameUri)
-          .then((response) => {
+          .then(response => {
             // Get device name from response
             var deviceName = response.data;
             // We use unshift instead of push to add the entry to the beginning of the array
             this.savedHosts.unshift({
               name: deviceName,
               hostname: host.hostname,
-              port: host.port,
+              port: host.port
             });
           })
-          .catch((error) => {
+          .catch(error => {
             this.modalError(error); // Let mixin handle error
           });
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

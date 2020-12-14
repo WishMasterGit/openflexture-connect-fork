@@ -13,10 +13,10 @@ export default {
   name: "App",
 
   components: {
-    connectDisplay,
+    connectDisplay
   },
 
-  data: function () {
+  data: function() {
     return {};
   },
 
@@ -24,11 +24,11 @@ export default {
 
   mounted() {},
 
-  created: function () {},
+  created: function() {},
 
-  beforeDestroy: function () {},
+  beforeDestroy: function() {},
 
-  methods: {},
+  methods: {}
 };
 </script>
 

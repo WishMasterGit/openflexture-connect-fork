@@ -108,6 +108,6 @@ module.exports = {
   writerOpts: {
     mainTemplate: mainTemplateStr,
     headerPartial: headerTemplateStr,
-    commitPartial: commitTemplateStr,
-  },
+    commitPartial: commitTemplateStr
+  }
 };

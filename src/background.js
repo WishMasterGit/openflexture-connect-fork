@@ -16,7 +16,7 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 contextMenu({
   showCopyImageAddress: true,
   showSaveImageAs: true,
-  showInspectElement: false,
+  showInspectElement: false
 });
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -29,24 +29,24 @@ require("./appMenu.js");
 // Auto upadater
 autoUpdater.autoDownload = false;
 
-autoUpdater.on("checking-for-update", function () {});
+autoUpdater.on("checking-for-update", function() {});
 
-autoUpdater.on("update-available", function (info) {
+autoUpdater.on("update-available", function(info) {
   console.log("Update available." + info);
   dialog
     .showMessageBox(win, {
       type: "info",
       title: "Update available",
       message: "A new version of OpenFlexure Connect is available.",
-      buttons: ["Download", "Later"],
+      buttons: ["Download", "Later"]
     })
-    .then((input) => {
+    .then(input => {
       if (input.response === 0) {
         console.log("Downloading update selected");
         handleDownloadUpdate();
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
     });
 });
@@ -62,22 +62,21 @@ function handleDownloadUpdate() {
       webPreferences: {
         // Use pluginOptions.nodeIntegration, leave this alone
         // See https://github.com/nklayman/vue-cli-plugin-electron-builder/blob/v2/docs/guide/configuration.md#node-integration for more info
-        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      },
-    },
+        nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
+      }
+    }
   });
 
-  progressBar.on("ready", function () {
-    autoUpdater.on("download-progress", function (info) {
+  progressBar.on("ready", function() {
+    autoUpdater.on("download-progress", function(info) {
       progressBar.value = info.percent;
-      progressBar.detail = `${Math.floor(info.percent)}% ${
-        info.bytesPerSecond / 1000
-      }kb/s`;
+      progressBar.detail = `${Math.floor(info.percent)}% ${info.bytesPerSecond /
+        1000}kb/s`;
     });
-    autoUpdater.on("update-downloaded", function () {
+    autoUpdater.on("update-downloaded", function() {
       progressBar.close();
     });
-    autoUpdater.on("error", function () {
+    autoUpdater.on("error", function() {
       progressBar.close();
     });
     autoUpdater.downloadUpdate();
@@ -85,43 +84,43 @@ function handleDownloadUpdate() {
 }
 
 // Trigger update installation
-autoUpdater.on("update-downloaded", function (info) {
+autoUpdater.on("update-downloaded", function(info) {
   console.log("Update downloaded." + info);
   dialog
     .showMessageBox(win, {
       type: "info",
       title: "Update downloaded",
       message: "Please restart the application to apply the update.",
-      buttons: ["Update", "Later"],
+      buttons: ["Update", "Later"]
     })
-    .then((input) => {
+    .then(input => {
       if (input.response === 0) {
         autoUpdater.quitAndInstall();
       }
     })
-    .catch((error) => {
+    .catch(error => {
       console.log(error);
     });
 });
 
-autoUpdater.on("update-not-available", function () {
+autoUpdater.on("update-not-available", function() {
   dialog.showMessageBox(win, {
     type: "info",
     title: "No updates available",
-    message: "You are on the latest version of OpenFlexure Connect.",
+    message: "You are on the latest version of OpenFlexure Connect."
   });
 });
 
-autoUpdater.on("error", function () {
+autoUpdater.on("error", function() {
   dialog.showMessageBox(win, {
     type: "info",
     title: "Error checking for updates",
     message:
-      "Error checking for updates. Make sure your device is connected to the internet.",
+      "Error checking for updates. Make sure your device is connected to the internet."
   });
 });
 
-autoUpdater.on("download-progress", function (progressObj) {
+autoUpdater.on("download-progress", function(progressObj) {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message =
     log_message + " - Downloaded " + parseInt(progressObj.percent) + "%";
@@ -137,7 +136,7 @@ autoUpdater.on("download-progress", function (progressObj) {
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
-  { scheme: "app", privileges: { secure: true, standard: true } },
+  { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
 
 function createWindow() {
@@ -150,8 +149,8 @@ function createWindow() {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See https://github.com/nklayman/vue-cli-plugin-electron-builder/blob/v2/docs/guide/configuration.md#node-integration for more info
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      enableRemoteModule: true,
-    },
+      enableRemoteModule: true
+    }
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -203,7 +202,7 @@ app.on("ready", async () => {
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {
-    process.on("message", (data) => {
+    process.on("message", data => {
       if (data === "graceful-exit") {
         app.quit();
       }

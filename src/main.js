@@ -6,7 +6,7 @@ Vue.config.productionTip = false;
 
 Vue.mixin({
   methods: {
-    getLocalStorageObj: function (keyName) {
+    getLocalStorageObj: function(keyName) {
       if (localStorage.getItem(keyName)) {
         try {
           return JSON.parse(localStorage.getItem(keyName));
@@ -18,12 +18,12 @@ Vue.mixin({
       }
     },
 
-    setLocalStorageObj: function (keyName, object) {
+    setLocalStorageObj: function(keyName, object) {
       const parsed = JSON.stringify(object);
       localStorage.setItem(keyName, parsed);
     },
 
-    modalDialog: function (title, message) {
+    modalDialog: function(title, message) {
       UIkit.modal.dialog(
         `
         <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -38,7 +38,7 @@ Vue.mixin({
       );
     },
 
-    modalError: function (error) {
+    modalError: function(error) {
       console.log(error);
       var errormsg = "";
 
@@ -65,12 +65,12 @@ Vue.mixin({
       }
       UIkit.notification({
         message: `${errormsg}`,
-        status: "danger",
+        status: "danger"
       });
-    },
-  },
+    }
+  }
 });
 
 new Vue({
-  render: (h) => h(App),
+  render: h => h(App)
 }).$mount("#app");
