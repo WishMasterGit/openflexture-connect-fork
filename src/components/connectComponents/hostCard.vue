@@ -70,56 +70,56 @@ export default {
   props: {
     name: {
       type: String,
-      required: true
+      required: true,
     },
     hostname: {
       type: String,
-      required: true
+      required: true,
     },
     port: {
       type: Number,
-      required: true
+      required: true,
     },
     deletable: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
     savable: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
     hideIfUnavailable: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
 
-  data: function() {
+  data: function () {
     return {
       snapshotRule: "/api/v2/streams/snapshot",
       snapshotSrc: "",
       snapshotAvailable: false,
-      polling: null
+      polling: null,
     };
   },
 
   computed: {
-    routesURL: function() {
+    routesURL: function () {
       return `http://${this.hostname}:${this.port}/routes`;
     },
-    snapshotURL: function() {
+    snapshotURL: function () {
       return `http://${this.hostname}:${this.port}${this.snapshotRule}`;
     },
-    shouldShow: function() {
+    shouldShow: function () {
       if (this.hideIfUnavailable && !this.snapshotAvailable) {
         return false;
       } else {
         return true;
       }
-    }
+    },
   },
 
   mounted() {
@@ -135,14 +135,14 @@ export default {
   },
 
   methods: {
-    checkSnapshotAvailable: function() {
+    checkSnapshotAvailable: function () {
       // Fetches the list of routes from the host, and starts
       // a snapshot timer if the snapshot route is available
 
       // Send tag request
       axios
         .get(this.routesURL)
-        .then(response => {
+        .then((response) => {
           // If the host has a snapshot route available
           if (this.snapshotRule in response.data) {
             // Tell the view that a snapshot is available
@@ -161,7 +161,7 @@ export default {
         });
     },
 
-    updateSnapshotURL: function() {
+    updateSnapshotURL: function () {
       // Set the snapshot image src to the snapshot URL,
       // adding a timestamp argument to act as a cache-breaker
       var candidatesnapshotSrc = `${this.snapshotURL}?${Date.now()}`;
@@ -178,22 +178,22 @@ export default {
         });
     },
 
-    updateSnapshotPoll: function() {
+    updateSnapshotPoll: function () {
       // Start a timer to call updateSnapshotURL periodically
       this.polling = setInterval(() => {
         this.updateSnapshotURL();
       }, 15000);
     },
 
-    setAvailability: function(availability) {
+    setAvailability: function (availability) {
       this.snapshotAvailable = availability;
       if (availability === true) {
         this.$emit("available");
       } else {
         this.$emit("unavailable");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

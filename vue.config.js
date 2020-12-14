@@ -1,13 +1,13 @@
 module.exports = {
   configureWebpack: {
-    plugins: []
+    plugins: [],
   },
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
       builderOptions: {
         directories: {
-          buildResources: "build"
+          buildResources: "build",
         },
         appId: "org.openflexure.ev",
         artifactName: "${name}-${version}-${os}-${arch}.${ext}",
@@ -15,8 +15,8 @@ module.exports = {
         publish: [
           {
             provider: "generic",
-            url: "https://build.openflexure.org/openflexure-ev/"
-          }
+            url: "https://build.openflexure.org/openflexure-ev/",
+          },
         ],
         files: [
           {
@@ -34,43 +34,43 @@ module.exports = {
               "!**/{appveyor.yml,.travis.yml,circle.yml}",
               "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}",
               "!**/{.idea,.vscode}${/*}",
-              "!src${/*}"
-            ]
-          }
+              "!src${/*}",
+            ],
+          },
         ],
         win: {
-          target: ["NSIS", "portable"]
+          target: ["NSIS", "portable"],
         },
         portable: {
-          artifactName: "${name}-${version}-${os}-${arch}-portable.${ext}"
+          artifactName: "${name}-${version}-${os}-${arch}-portable.${ext}",
         },
         linux: {
           target: [
             {
               target: "appImage",
-              arch: ["x64", "armv7l"]
-            }
+              arch: ["x64", "armv7l"],
+            },
           ],
-          category: "Science"
+          category: "Science",
         },
         mac: {
-          category: "public.app-category.utilities"
+          category: "public.app-category.utilities",
         },
         dmg: {
           contents: [
             {
               x: 110,
-              y: 150
+              y: 150,
             },
             {
               x: 240,
               y: 150,
               type: "link",
-              path: "/Applications"
-            }
-          ]
-        }
-      }
-    }
-  }
+              path: "/Applications",
+            },
+          ],
+        },
+      },
+    },
+  },
 };

@@ -1,6 +1,43 @@
+# [4.0.0](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.2...v4.0.0) (2020-12-11)
+
+## Feature
+
+* Updated icon ([7e93e8e](https://gitlab.com/openflexure/openflexure-connect/commit/7e93e8e))
+* Changed default remote hostname to microscope.local ([470932d](https://gitlab.com/openflexure/openflexure-connect/commit/470932d))
+* Improved host card layout ([8149593](https://gitlab.com/openflexure/openflexure-connect/commit/8149593))
+
+## Fix
+
+* Fix eslint dependency ([491f830](https://gitlab.com/openflexure/openflexure-connect/commit/491f830))
+* Fix use of deprecated electron functions ([ab3fb43](https://gitlab.com/openflexure/openflexure-connect/commit/ab3fb43))
+* Fixed host deletion, improved data flow, and support ipv6 ([5b8b3ba](https://gitlab.com/openflexure/openflexure-connect/commit/5b8b3ba))
+
+## Cleanup
+
+* Added explicit node integration ([3dff5e4](https://gitlab.com/openflexure/openflexure-connect/commit/3dff5e4))
+* Added local debug guide ([2ec72b2](https://gitlab.com/openflexure/openflexure-connect/commit/2ec72b2))
+* Added nofix lint script ([0734af6](https://gitlab.com/openflexure/openflexure-connect/commit/0734af6))
+* Remove reference to eV ([f3519b0](https://gitlab.com/openflexure/openflexure-connect/commit/f3519b0))
+* Removed unused custom titlebar code ([3c58c30](https://gitlab.com/openflexure/openflexure-connect/commit/3c58c30))
+* Removed unused deps, imports, and components ([b75136a](https://gitlab.com/openflexure/openflexure-connect/commit/b75136a))
+* Removed winget manifest ([03ee6c1](https://gitlab.com/openflexure/openflexure-connect/commit/03ee6c1))
+* Unified eslint config to JS Client ([4ce6023](https://gitlab.com/openflexure/openflexure-connect/commit/4ce6023))
+
+## CI
+
+* Added ESLint to CI script ([974c65a](https://gitlab.com/openflexure/openflexure-connect/commit/974c65a))
+
+## Documentation
+
+* Update README.md ([0ed34ce](https://gitlab.com/openflexure/openflexure-connect/commit/0ed34ce))
+* Updated changelog ([8ee9335](https://gitlab.com/openflexure/openflexure-connect/commit/8ee9335))
+* Updated dependencies ([2dfe980](https://gitlab.com/openflexure/openflexure-connect/commit/2dfe980))
+* Added Key info ([45d3bfd](https://gitlab.com/openflexure/openflexure-connect/commit/45d3bfd))
+
 ## [3.0.2](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.1...v3.0.2) (2020-06-25)
 
 
+* 3.0.2 ([df8a109](https://gitlab.com/openflexure/openflexure-connect/commit/df8a109))
 * Fixed update flow and removed startup check ([33f4e9f](https://gitlab.com/openflexure/openflexure-connect/commit/33f4e9f))
 * Stop building on every branch commit ([c95d2a0](https://gitlab.com/openflexure/openflexure-connect/commit/c95d2a0))
 * Updated changelog ([f2732f5](https://gitlab.com/openflexure/openflexure-connect/commit/f2732f5))

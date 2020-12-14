@@ -18,8 +18,8 @@ const template = [
       { role: "copy" },
       { role: "paste" },
       { role: "delete" },
-      { role: "selectall" }
-    ]
+      { role: "selectall" },
+    ],
   },
   {
     label: "View",
@@ -28,12 +28,12 @@ const template = [
       { role: "forcereload" },
       { role: "toggledevtools" },
       { type: "separator" },
-      { role: "togglefullscreen" }
-    ]
+      { role: "togglefullscreen" },
+    ],
   },
   {
     role: "window",
-    submenu: [{ role: "minimize" }, { role: "close" }]
+    submenu: [{ role: "minimize" }, { role: "close" }],
   },
   {
     role: "help",
@@ -49,8 +49,8 @@ const template = [
             homepage: "https://gitlab.com/openflexure/openflexure-connect",
             bug_report_url:
               "https://gitlab.com/openflexure/openflexure-connect/issues",
-            license: "GNU General Public License v3.0"
-          })
+            license: "GNU General Public License v3.0",
+          }),
       },
       {
         label: "Report an issue",
@@ -58,17 +58,17 @@ const template = [
           shell.openExternal(
             "https://gitlab.com/openflexure/openflexure-connect/issues"
           );
-        }
+        },
       },
       { type: "separator" },
       {
         label: "Check for Updates",
         click() {
           autoUpdater.checkForUpdates();
-        }
-      }
-    ]
-  }
+        },
+      },
+    ],
+  },
 ];
 
 if (process.platform === "darwin") {
@@ -83,8 +83,8 @@ if (process.platform === "darwin") {
       { role: "hideothers" },
       { role: "unhide" },
       { type: "separator" },
-      { role: "quit" }
-    ]
+      { role: "quit" },
+    ],
   });
 
   // Edit menu
@@ -92,7 +92,7 @@ if (process.platform === "darwin") {
     { type: "separator" },
     {
       label: "Speech",
-      submenu: [{ role: "startspeaking" }, { role: "stopspeaking" }]
+      submenu: [{ role: "startspeaking" }, { role: "stopspeaking" }],
     }
   );
 
@@ -102,12 +102,12 @@ if (process.platform === "darwin") {
     { role: "minimize" },
     { role: "zoom" },
     { type: "separator" },
-    { role: "front" }
+    { role: "front" },
   ];
 } else {
   template.unshift({
     label: "File",
-    submenu: [{ role: "quit" }]
+    submenu: [{ role: "quit" }],
   });
 }
 
