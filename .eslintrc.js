@@ -1,21 +1,24 @@
 module.exports = {
   root: true,
+
   env: {
     node: true
   },
+
+  parserOptions: {
+    parser: "babel-eslint",
+    ecmaVersion: 2020
+  },
+
+  rules: {
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
+  },
+
   extends: [
     "plugin:vue/recommended",
     "eslint:recommended",
-    "prettier/vue",
-    "plugin:prettier/recommended"
-  ],
-  rules: {
-    "vue/component-name-in-template-casing": ["error", "PascalCase"],
-    //"no-console": process.env.NODE_ENV === "production" ? "error" : "off",
-    "no-console": "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off"
-  },
-  globals: {
-    $nuxt: true
-  }
+    "@vue/prettier",
+    "plugin:vue/essential"
+  ]
 };

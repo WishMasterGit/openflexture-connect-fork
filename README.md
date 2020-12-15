@@ -41,6 +41,12 @@ Scripts to build, and package Electron apps, are included in `package.json`
 
 * `npm run electron:build`
 
+### Debug on your local operating system
+
+You can launch the app with Vue debug tools and hot-reload enabled with:
+
+* `npm run electron:serve`
+
 ## Developer notes
 
 ### VS Code and ESLint

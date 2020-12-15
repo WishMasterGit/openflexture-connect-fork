@@ -32,22 +32,29 @@
           </div>
           <div class="host-description">{{ hostname }}:{{ port }}</div>
         </div>
-        <a
-          v-if="deletable"
-          href="#"
-          class="uk-icon uk-width-auto host-delete"
-          @click="$emit('delete')"
-          ><i class="material-icons">delete</i></a
-        >
       </div>
     </div>
 
     <div class="uk-card-footer uk-padding-small">
       <button
-        class="uk-button uk-button-default uk-form-small uk-float-right uk-margin uk-margin-remove-top uk-width-1-1"
+        class="uk-button uk-button-primary uk-form-small uk-margin-small-bottom uk-width-1-1"
         @click="$emit('connect')"
       >
         Connect
+      </button>
+      <button
+        v-if="deletable"
+        class="uk-button uk-button-danger uk-form-small uk-margin-small-bottom uk-width-1-1"
+        @click="$emit('delete')"
+      >
+        Remove
+      </button>
+      <button
+        v-if="savable"
+        class="uk-button uk-button-default uk-form-small uk-margin-small-bottom uk-width-1-1"
+        @click="$emit('save')"
+      >
+        Save
       </button>
     </div>
   </div>
@@ -74,6 +81,11 @@ export default {
       required: true
     },
     deletable: {
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    savable: {
       type: Boolean,
       required: false,
       default: true

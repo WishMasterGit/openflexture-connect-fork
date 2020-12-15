@@ -1,20 +1,46 @@
 stages:
+  - analysis
   - build
   - deploy
 
+# Re-usable block to install (and cache) openflexure-microscope-server static app
+.node-install-template: &node-install
+  before_script:
+    - npm install
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - node_modules
+
+# JavaScript linting with ESLint (via Vue CLI)
+eslint:
+  stage: analysis
+  image: electronuserland/builder:wine
+
+  <<: *node-install
+
+  script:
+    # Build JS application for production
+    - npm run lint
+
+  only:
+    - branches
+    - merge_requests
+    - tags
+    - web
 
 # Electron app build
 build:
   stage: build
+  dependencies:
+    - eslint
   image: electronuserland/builder:wine
- 
+
+  <<: *node-install
+
   script:
-    # Install node dependencies
-    - npm install
     # Build electron app
     - npm run electron:release
-    # Make release manifests
-    - npm run makemanifests
 
   artifacts:
     name: "dist_electron"
@@ -58,4 +84,5 @@ deploy:
     - ssh -t ci-user@openflexure.bath.ac.uk "/var/www/build/update-latest.py"
     
   only:
+    - web
     - tags

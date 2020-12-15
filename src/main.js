@@ -2,11 +2,6 @@ import Vue from "vue";
 import App from "./App.vue";
 import UIkit from "uikit";
 
-// Import MD icons
-import "material-design-icons/iconfont/material-icons.css";
-
-console.log("Loaded main.app.js for electron-renderer functionality");
-
 Vue.config.productionTip = false;
 
 Vue.mixin({
@@ -26,26 +21,6 @@ Vue.mixin({
     setLocalStorageObj: function(keyName, object) {
       const parsed = JSON.stringify(object);
       localStorage.setItem(keyName, parsed);
-    },
-    modalConfirm: function(modalText) {
-      var showModal = function(resolve, reject) {
-        UIkit.modal.confirm(modalText, { stack: true }).then(
-          function() {
-            resolve();
-          },
-          function() {
-            reject();
-          }
-        );
-      };
-      return new Promise(showModal);
-    },
-
-    modalNotify: function(message, status = "success") {
-      UIkit.notification({
-        message: message,
-        status: status
-      });
     },
 
     modalDialog: function(title, message) {
