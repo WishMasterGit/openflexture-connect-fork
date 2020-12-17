@@ -1,38 +1,42 @@
+## [4.0.1](https://gitlab.com/openflexure/openflexure-connect/compare/v4.0.0...v4.0.1) (2020-12-17)
+
+* Publish to Snap store ([3aa2052](https://gitlab.com/openflexure/openflexure-connect/commit/3aa2052))
+* Improved update error dialog ([0b49166](https://gitlab.com/openflexure/openflexure-connect/commit/0b49166))
+
+### Developer changes
+
+* Fixed missing eslint dev dependency ([00187b0](https://gitlab.com/openflexure/openflexure-connect/commit/00187b0))
+* Linting, changelog, and dependency updates ([050f8e0](https://gitlab.com/openflexure/openflexure-connect/commit/050f8e0))
+* Properly fixed vue linting? ([5c5ab86](https://gitlab.com/openflexure/openflexure-connect/commit/5c5ab86))
+* Removed todo comment ([8cdab6c](https://gitlab.com/openflexure/openflexure-connect/commit/8cdab6c))
+* Updated cli-plugin-eslint ([cc38d03](https://gitlab.com/openflexure/openflexure-connect/commit/cc38d03))
+* Updated eslint-plugin-prettier ([0466249](https://gitlab.com/openflexure/openflexure-connect/commit/0466249))
+
+
 # [4.0.0](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.2...v4.0.0) (2020-12-11)
 
-## Feature
 
-* Updated icon ([7e93e8e](https://gitlab.com/openflexure/openflexure-connect/commit/7e93e8e))
+* 4.0.0 ([1962679](https://gitlab.com/openflexure/openflexure-connect/commit/1962679))
+* Added ESLint to CI script ([974c65a](https://gitlab.com/openflexure/openflexure-connect/commit/974c65a))
+* Added explicit node integration ([3dff5e4](https://gitlab.com/openflexure/openflexure-connect/commit/3dff5e4))
+* Added Key info ([45d3bfd](https://gitlab.com/openflexure/openflexure-connect/commit/45d3bfd))
+* Added local debug guide ([2ec72b2](https://gitlab.com/openflexure/openflexure-connect/commit/2ec72b2))
+* Added nofix lint script ([0734af6](https://gitlab.com/openflexure/openflexure-connect/commit/0734af6))
 * Changed default remote hostname to microscope.local ([470932d](https://gitlab.com/openflexure/openflexure-connect/commit/470932d))
-* Improved host card layout ([8149593](https://gitlab.com/openflexure/openflexure-connect/commit/8149593))
-
-## Fix
-
 * Fix eslint dependency ([491f830](https://gitlab.com/openflexure/openflexure-connect/commit/491f830))
 * Fix use of deprecated electron functions ([ab3fb43](https://gitlab.com/openflexure/openflexure-connect/commit/ab3fb43))
 * Fixed host deletion, improved data flow, and support ipv6 ([5b8b3ba](https://gitlab.com/openflexure/openflexure-connect/commit/5b8b3ba))
-
-## Cleanup
-
-* Added explicit node integration ([3dff5e4](https://gitlab.com/openflexure/openflexure-connect/commit/3dff5e4))
-* Added local debug guide ([2ec72b2](https://gitlab.com/openflexure/openflexure-connect/commit/2ec72b2))
-* Added nofix lint script ([0734af6](https://gitlab.com/openflexure/openflexure-connect/commit/0734af6))
+* Improved host card layout ([8149593](https://gitlab.com/openflexure/openflexure-connect/commit/8149593))
 * Remove reference to eV ([f3519b0](https://gitlab.com/openflexure/openflexure-connect/commit/f3519b0))
 * Removed unused custom titlebar code ([3c58c30](https://gitlab.com/openflexure/openflexure-connect/commit/3c58c30))
 * Removed unused deps, imports, and components ([b75136a](https://gitlab.com/openflexure/openflexure-connect/commit/b75136a))
 * Removed winget manifest ([03ee6c1](https://gitlab.com/openflexure/openflexure-connect/commit/03ee6c1))
 * Unified eslint config to JS Client ([4ce6023](https://gitlab.com/openflexure/openflexure-connect/commit/4ce6023))
-
-## CI
-
-* Added ESLint to CI script ([974c65a](https://gitlab.com/openflexure/openflexure-connect/commit/974c65a))
-
-## Documentation
-
 * Update README.md ([0ed34ce](https://gitlab.com/openflexure/openflexure-connect/commit/0ed34ce))
 * Updated changelog ([8ee9335](https://gitlab.com/openflexure/openflexure-connect/commit/8ee9335))
 * Updated dependencies ([2dfe980](https://gitlab.com/openflexure/openflexure-connect/commit/2dfe980))
-* Added Key info ([45d3bfd](https://gitlab.com/openflexure/openflexure-connect/commit/45d3bfd))
+* Updated icon ([7e93e8e](https://gitlab.com/openflexure/openflexure-connect/commit/7e93e8e))
+
 
 ## [3.0.2](https://gitlab.com/openflexure/openflexure-connect/compare/v3.0.1...v3.0.2) (2020-06-25)
 
