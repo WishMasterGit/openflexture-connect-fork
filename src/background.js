@@ -111,13 +111,31 @@ autoUpdater.on("update-not-available", function() {
   });
 });
 
-autoUpdater.on("error", function() {
-  dialog.showMessageBox(win, {
-    type: "info",
-    title: "Error checking for updates",
-    message:
-      "Error checking for updates. Make sure your device is connected to the internet."
-  });
+autoUpdater.on("error", function(error) {
+  dialog
+    .showMessageBox(win, {
+      type: "info",
+      title: "Unable to find updates",
+      message:
+        "Make sure your device is connected to the internet.\nIf you installed OpenFlexure Connect from an app store, use that to handle updates.",
+      buttons: ["Details", "OK"],
+      defaultId: 1, // Default to OK
+      cancelId: 1, // Close with OK
+      noLink: true // Format normally in Windows
+    })
+    .then(input => {
+      if (input.response === 0) {
+        console.log(error);
+        dialog.showMessageBox(win, {
+          type: "info",
+          title: "Update error details",
+          message: error.toString()
+        });
+      }
+    })
+    .catch(error => {
+      console.log(error);
+    });
 });
 
 autoUpdater.on("download-progress", function(progressObj) {
