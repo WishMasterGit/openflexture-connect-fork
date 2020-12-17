@@ -49,6 +49,10 @@ module.exports = {
             {
               target: "appImage",
               arch: ["x64", "armv7l"]
+            },
+            {
+              target: "snap",
+              arch: ["x64", "armv7l"]
             }
           ],
           category: "Science"
