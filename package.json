@@ -1,6 +1,6 @@
 {
   "name": "openflexure-connect",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope",
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
