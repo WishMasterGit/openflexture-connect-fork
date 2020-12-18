@@ -62,20 +62,6 @@ packageVersion=$(cat $packageJson \
 
 echo "$packageVersion"
 
-# Convert into a nupkg-safe version string
-majVer="$(echo "$packageVersion" | cut -d'-' -f1)"
-minVer="$(echo "$packageVersion" | cut -d'-' -f2)"
-
-if [ "$majVer" = "$minVer" ]; then
-  version="$majVer"
-else
-  minVer="${minVer//.}"
-  version="$majVer-$minVer"  
-fi
-
-
-echo "$version"
-
 # Build installer URL
 instURL="$deployRoot/openflexure-connect-$packageVersion-win.exe"
 echo $instURL
@@ -87,7 +73,7 @@ cat > "$outpath/openflexureConnect.nuspec" <<- EOL
   <metadata>
     <id>$packageName</id>
     <title>$productName</title>
-    <version>$version</version>
+    <version>$packageVersion</version>
     <authors>$publisher</authors>
     <owners>Bath Open Instrumentation Group</owners>
     <summary>$description</summary>
