@@ -108,7 +108,7 @@ release-snap:
 
 # Chocolatey release
 release-choco:
-  image: patrickhuber/choco-linux
+  image: linuturk/mono-choco
   stage: deploy
   dependencies:
     - build
@@ -117,9 +117,9 @@ release-choco:
     - chmod +x ./choco/make-nupkg.sh
     - ./choco/make-nupkg.sh
     - cd ./choco/release
-    - choco pack
-    - choco apikey --key "$CHOCO_APIKEY" --source https://push.chocolatey.org/
-    - choco push --source https://push.chocolatey.org/
+    - choco pack  --allow-unofficial
+    - choco apikey --allow-unofficial --key "$CHOCO_APIKEY" --source https://push.chocolatey.org/
+    - choco push --allow-unofficial --source https://push.chocolatey.org/
 
   only:
     - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
