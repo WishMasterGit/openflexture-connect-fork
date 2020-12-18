@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build --publish never",
+    "electron:build:win": "vue-cli-service electron:build -w --publish never",
     "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "electron:release": "vue-cli-service electron:build -wl --publish never",
     "electron:serve": "vue-cli-service electron:serve",
