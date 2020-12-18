@@ -114,6 +114,7 @@ release-choco:
     - build
 
   script:
+    - chmod +x ./choco/make-nupkg.sh
     - ./choco/make-nupkg.sh
     - cd ./choco/release
     - choco pack
