@@ -5,6 +5,7 @@ node_modules
 /app/dist
 /release-builds
 /installers/release-builds
+/choco/release
 
 # local env files
 .env.local

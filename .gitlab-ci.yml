@@ -105,3 +105,24 @@ release-snap:
   only:
     - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
     - web  # Allow force publish via web
+
+# Chocolatey release
+release-choco:
+  image: 
+    name: linuturk/mono-choco
+    entrypoint: [""]
+  stage: deploy
+  dependencies:
+    - build
+
+  script:
+    - chmod +x ./choco/make-nupkg.sh
+    - ./choco/make-nupkg.sh
+    - cd ./choco/release
+    - choco pack  --allow-unofficial
+    - choco apikey --allow-unofficial --key "$CHOCO_APIKEY" --source https://push.chocolatey.org/
+    - choco push --allow-unofficial --source https://push.chocolatey.org/
+
+  only:
+    - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
+    - web  # Allow force publish via web
