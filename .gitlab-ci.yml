@@ -108,8 +108,9 @@ release-snap:
 
 # Chocolatey release
 release-choco:
-  image: linuturk/mono-choco
-  entrypoint: [""]
+  image: 
+    name: linuturk/mono-choco
+    entrypoint: [""]
   stage: deploy
   dependencies:
     - build
