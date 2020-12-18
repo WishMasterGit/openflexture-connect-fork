@@ -105,3 +105,21 @@ release-snap:
   only:
     - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
     - web  # Allow force publish via web
+
+# Chocolatey release
+release-choco:
+  image: patrickhuber/choco-linux
+  stage: deploy
+  dependencies:
+    - build
+
+  script:
+    - ./choco/make-nupkg.sh
+    - cd ./choco/release
+    - choco pack
+    - choco apikey --key "$CHOCO_APIKEY" --source https://push.chocolatey.org/
+    - choco push --source https://push.chocolatey.org/
+
+  only:
+    - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
+    - web  # Allow force publish via web

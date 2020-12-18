@@ -1,7 +1,7 @@
 silentArgs='/S'
 fileType='exe'
 
-deployRoot='https://build.openflexure.org/openflexure-ev/'
+deployRoot='https://build.openflexure.org/openflexure-ev'
 
 scriptPath=`dirname $0`
 packagePath="$(dirname "$scriptPath")"
@@ -81,7 +81,7 @@ instURL="$deployRoot/openflexure-connect-$packageVersion-win.exe"
 echo $instURL
 
 # Build nuspec
-cat > "$outpath/openflexure-ev.nuspec" <<- EOL
+cat > "$outpath/openflexureConnect.nuspec" <<- EOL
 <?xml version="1.0"?>
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata>
@@ -102,7 +102,7 @@ cat > "$outpath/openflexure-ev.nuspec" <<- EOL
     <tags>openflexure microscope connect</tags>
     <licenseUrl>https://gitlab.com/openflexure/openflexure-connect/raw/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <iconUrl>https://gitlab.com/openflexure/openflexure-connect/raw/master/build/icons/512x512.png</iconUrl>
+    <iconUrl>$deployRoot/512x512.png</iconUrl>
   </metadata>
   <files>
     <file src="tools/**" target="tools" />
@@ -113,6 +113,3 @@ EOL
 # Build installer PS1 content
 instPS1="Install-ChocolateyPackage $packageName $fileType $silentArgs $instURL"
 echo $instPS1 > "$toolspath/chocolateyInstall.ps1"
-
-# Build nupkg
-# choco pack --allow-unofficial --outputdirectory $outpath "$outpath/openflexure-ev.nuspec"
