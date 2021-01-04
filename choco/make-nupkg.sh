@@ -1,3 +1,7 @@
+shaUrl() {
+  curl -sL "$1" | sha256sum | cut -d " " -f 1
+}
+
 silentArgs='/S'
 fileType='exe'
 
@@ -66,6 +70,10 @@ echo "$packageVersion"
 instURL="$deployRoot/openflexure-connect-$packageVersion-win.exe"
 echo $instURL
 
+# Build installer hash
+instHash=$(shaUrl $instURL)
+echo $instHash
+
 # Build nuspec
 cat > "$outpath/openflexureConnect.nuspec" <<- EOL
 <?xml version="1.0"?>
@@ -97,5 +105,5 @@ cat > "$outpath/openflexureConnect.nuspec" <<- EOL
 EOL
 
 # Build installer PS1 content
-instPS1="Install-ChocolateyPackage $packageName $fileType $silentArgs $instURL"
+instPS1="Install-ChocolateyPackage -PackageName $packageName -FileType $fileType -SilentArgs $silentArgs -Url $instURL -Checksum $instHash -ChecksumType sha256"
 echo $instPS1 > "$toolspath/chocolateyInstall.ps1"

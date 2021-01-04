@@ -2,6 +2,7 @@ stages:
   - analysis
   - build
   - deploy
+  - release
 
 # Re-usable block to install (and cache) openflexure-microscope-server static app
 .node-install-template: &node-install
@@ -91,7 +92,7 @@ deploy:
 # Snap release
 release-snap:
   image: snapcore/snapcraft:stable
-  stage: deploy
+  stage: release
   dependencies:
     - build
 
@@ -111,7 +112,7 @@ release-choco:
   image: 
     name: linuturk/mono-choco
     entrypoint: [""]
-  stage: deploy
+  stage: release
   dependencies:
     - build
 
