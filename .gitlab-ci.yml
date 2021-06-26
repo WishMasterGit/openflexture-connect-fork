@@ -13,6 +13,12 @@ stages:
     paths:
       - node_modules
 
+.shared_windows_runners:
+  tags:
+  - shared-windows
+  - windows
+  - windows-1809
+
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
   stage: analysis
@@ -60,6 +66,30 @@ build:
     - web
     - tags
 
+build-appx:
+  stage: build
+  extends:
+  - .shared_windows_runners
+  dependencies:
+    - eslint
+  image: electronuserland/builder:wine
+
+  <<: *node-install
+
+  script:
+    # Build electron app
+    - npm run electron:build:win
+
+  artifacts:
+    name: "dist_electron"
+    expire_in: 1 week
+    paths:
+      - "./dist_electron/*.appx"
+
+  only:
+    - merge_requests
+    - web
+    - tags
 
 # Deploy to builds.openflexure.org
 deploy:
