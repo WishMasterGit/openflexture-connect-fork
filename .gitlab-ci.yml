@@ -2,10 +2,10 @@ stages:
   - analysis
   - build
   - deploy
-  - release
 
 # Re-usable block to install (and cache) openflexure-microscope-server static app
-.node-install-template: &node-install
+.node-job:
+  image: electronuserland/builder:18-wine-mono
   before_script:
     - npm install
   cache:
@@ -15,10 +15,8 @@ stages:
 
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
+  extends: .node-job
   stage: analysis
-  image: electronuserland/builder:wine
-
-  <<: *node-install
 
   script:
     # Build JS application for production
@@ -32,12 +30,10 @@ eslint:
 
 # Electron app build
 build:
+  extends: .node-job
   stage: build
   dependencies:
     - eslint
-  image: electronuserland/builder:wine
-
-  <<: *node-install
 
   script:
     # Build electron app
@@ -85,45 +81,6 @@ deploy:
     # Run update-latest.py on the build server
     - ssh -t ci-user@openflexure.bath.ac.uk "/var/www/build/update-latest.py"
     
-  only:
-    - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
-    - web  # Allow force publish via web
-
-# Snap release
-release-snap:
-  image: snapcore/snapcraft:stable
-  stage: release
-  dependencies:
-    - build
-
-  before_script: []
-  script:
-    # Publish snap package
-    - echo "Publishing snap package..."
-    - echo "$SNAPCRAFT_LOGIN" | base64 -d > snapcraft.login
-    - snapcraft login --with snapcraft.login
-    - for f in dist_electron/*.snap; do snapcraft upload --release=stable $f; done
-  only:
-    - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
-    - web  # Allow force publish via web
-
-# Chocolatey release
-release-choco:
-  image: 
-    name: linuturk/mono-choco
-    entrypoint: [""]
-  stage: release
-  dependencies:
-    - build
-
-  script:
-    - chmod +x ./choco/make-nupkg.sh
-    - ./choco/make-nupkg.sh
-    - cd ./choco/release
-    - choco pack  --allow-unofficial
-    - choco apikey --allow-unofficial --key "$CHOCO_APIKEY" --source https://push.chocolatey.org/
-    - choco push --allow-unofficial --source https://push.chocolatey.org/
-
   only:
     - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
     - web  # Allow force publish via web
