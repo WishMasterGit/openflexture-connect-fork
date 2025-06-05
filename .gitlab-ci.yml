@@ -5,7 +5,7 @@ stages:
 
 # Re-usable block to install (and cache) openflexure-microscope-server static app
 .node-job:
-  image: electronuserland/builder:18-wine-mono
+  image: electronuserland/builder:22-wine-mono
   before_script:
     - npm install
   cache:

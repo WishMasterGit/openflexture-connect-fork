@@ -1,6 +1,6 @@
 {
   "name": "openflexure-connect",
-  "version": "4.0.1",
+  "version": "5.0.0-beta.1",
   "private": true,
   "description": "An electron-based user client for the OpenFlexure Microscope",
   "author": "OpenFlexure <contact@openflexure.org> (https://www.openflexure.org)",
@@ -17,10 +17,10 @@
   "main": "background.js",
   "dependencies": {
     "about-window": "^1.13.4",
-    "electron-context-menu": "^2.0.1",
-    "electron-progressbar": "^1.2.0",
+    "electron-context-menu": "^4.1.0",
+    "electron-progressbar": "^2.2.1",
     "electron-store": "^5.2.0",
-    "electron-updater": "^4.3.1"
+    "electron-updater": "^6.6.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~4.5.0",
@@ -29,7 +29,7 @@
     "axios": "^0.19.2",
     "babel-eslint": "^10.1.0",
     "css-loader": "^3.6.0",
-    "electron": "^9.0.5",
+    "electron": "^36.0.0",
     "electron-devtools-installer": "^3.1.1",
     "electron-icon-builder": "^1.0.2",
     "eslint": "^6.8.0",
