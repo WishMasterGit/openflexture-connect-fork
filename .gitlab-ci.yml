@@ -36,6 +36,7 @@ build:
     - eslint
 
   script:
+    - export NODE_OPTIONS=--openssl-legacy-provider
     # Build electron app
     - npm run electron:release
 
