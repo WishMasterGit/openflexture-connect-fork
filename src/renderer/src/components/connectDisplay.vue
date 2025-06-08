@@ -89,14 +89,6 @@
       <li id="nearby-connections-grid" class="uk-open">
         <a class="uk-accordion-title" href="#">Nearby devices</a>
         <div class="uk-accordion-content">
-          <div class="uk-width-medium">
-              <button
-                class="uk-button uk-button-default uk-form-small uk-margin-small uk-width-1-1"
-                @click="reloadNearby()"
-              >
-                Refresh
-              </button>
-            </div>
           <div class="uk-grid-medium uk-grid-match" uk-grid>
             
             <div v-for="host in foundHostArray" :key="host.name">
@@ -120,7 +112,7 @@
           <div class="uk-grid-medium uk-grid-match" uk-grid>
             <div v-for="host in savedHostArray" :key="host.name">
               <hostCard
-                :name="host.name"
+                name="Saved microscope"
                 :hostname="host.hostname"
                 :port="host.port"
                 :hide-if-unavailable="false"
@@ -155,7 +147,8 @@ export default {
       hostname: "microscope.local",
       port: 5000,
       savedHosts: {},
-      foundHosts: {}
+      foundHosts: {},
+      relaodTimer: null
     };
   },
 
@@ -181,6 +174,9 @@ export default {
   },
 
   mounted() {
+    this.timer = setInterval(() => {
+      this.reloadNearby()
+    }, 10000)
     this.foundHosts = window.api.getMicroscopes();
     window.api.getSavedHosts().then(response => {
       this.savedHosts = response;
@@ -192,7 +188,7 @@ export default {
   methods: {
     reloadNearby: async function() {
         window.api.findMicroscopes();
-        await setTimeout(2000);
+        await new Promise(r => setTimeout(r, 2000));
         this.foundHosts = window.api.getMicroscopes();
     },
     getManualHost: function() {
