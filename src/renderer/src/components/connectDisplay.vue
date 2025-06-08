@@ -82,12 +82,23 @@
       </div>
     </div>
 
+    
+
     <!-- Nearby devices -->
     <ul uk-accordion="multiple: true; animation: false">
       <li id="nearby-connections-grid" class="uk-open">
         <a class="uk-accordion-title" href="#">Nearby devices</a>
         <div class="uk-accordion-content">
+          <div class="uk-width-medium">
+              <button
+                class="uk-button uk-button-default uk-form-small uk-margin-small uk-width-1-1"
+                @click="reloadNearby()"
+              >
+                Refresh
+              </button>
+            </div>
           <div class="uk-grid-medium uk-grid-match" uk-grid>
+            
             <div v-for="host in foundHostArray" :key="host.name">
               <hostCard
                 :name="host.name"
@@ -126,18 +137,9 @@
 </template>
 
 <script>
-/* global __static */
-
-// Import mDNS package if running in Electron
-var mdns = require("mdns-js");
-const { BrowserWindow } = require("electron").remote;
-const path = require("path");
-const ipaddr = require("ipaddr.js");
-
+import hostCard from "./connectComponents/hostCard.vue";
 import axios from "axios";
 import UIkit from "uikit";
-import remoteMenu from "../remoteMenu.js";
-import hostCard from "./connectComponents/hostCard.vue";
 
 // Export main app
 export default {
@@ -179,55 +181,17 @@ export default {
 
   // When savedHosts changes, serialise to JSON and save to localStorage
   watch: {
-    savedHosts() {
-      this.setLocalStorageObj("savedHosts", this.savedHosts);
-    }
   },
 
   mounted() {
-    // Try loading savedHosts from localStorage. If null, don't change.
-    this.savedHosts = this.getLocalStorageObj("savedHosts") || this.savedHosts;
-
-    // Handle mDNS browsing
-
-    // TODO: Have this run periodically on a timer
-
-    // Create a browser to search for 'openflexure' type services
-    var browser = mdns.createBrowser(mdns.tcp("openflexure"));
-
-    // Start discovering services when ready
-    browser.on("ready", function() {
-      browser.discover();
-    });
-
-    browser.on("update", data => {
-      // We will be checking if it's a valid openflexure device
-      var validDevice = false;
-
-      // Go through each type of the host, make valid if 'openflexure' appears
-      data.type.forEach(element => {
-        //console.log(element);
-        if (element.name === "openflexure") {
-          validDevice = true;
-        }
-      });
-
-      if (validDevice === true) {
-        console.log(data);
-      }
-
-      if (typeof data.port !== "undefined" && validDevice === true) {
-        var hostData = {
-          hostname: data.addresses[0],
-          name: `${data.host} on ${data.networkInterface}`,
-          port: data.port
-        };
-        this.$set(this.foundHosts, hostData.hostname, hostData);
-      }
-    });
+    this.foundHosts = window.api.getMicroscopes();
   },
 
   methods: {
+    reloadNearby: function() {
+        window.api.findMicroscopes();
+        this.foundHosts = window.api.getMicroscopes();
+    },
     getManualHost: function() {
       // Get the currently selected host object from the manual connect box
       let hostname = this.hostname;
@@ -238,17 +202,9 @@ export default {
       }
       return { hostname: hostname, port: port };
     },
-
     buildHostURL: function(hostname, port) {
-      // IPv6-based URLs have to be wrapped in [] when specifying a port
-      if (ipaddr.isValid(hostname)) {
-        if (ipaddr.parse(hostname).kind() == "ipv6") {
-          return `http://[${hostname}]:${port}`;
-        }
-      }
-      return `http://${hostname}:${port}`;
+        return window.api.buildHostURL(hostname, port);
     },
-
     connectHost: function(host) {
       // Set the remote connect box values
       this.localMode = false;
@@ -266,14 +222,7 @@ export default {
         .then(response => {
           // If the /api/v2 route is available
           if (Object.keys(response.data).includes("/api/v2/")) {
-            console.log("API v2 available");
-            let win = new BrowserWindow({
-              width: 1200,
-              height: 893,
-              icon: path.join(__static, "icon.png")
-            });
-            win.setMenu(remoteMenu);
-            win.loadURL(selectedHostURL);
+            window.open(selectedHostURL, 'modal');
           } else {
             // Error and no-connect if API v2 is missing
             var ApiVersionError = `Your microscope is running an old API version.\
@@ -286,42 +235,10 @@ export default {
           }
         })
         .catch(error => {
-          this.modalError(error); // Let mixin handle error
+          //this.modalError(error); // Let mixin handle error
+          console.log(error);
         });
     },
-
-    removeHost: function(host) {
-      console.log(host);
-      var index = this.savedHosts.indexOf(host);
-      if (index > -1) {
-        this.savedHosts.splice(index, 1);
-      }
-    },
-
-    saveHost: function(host) {
-      // Check if we already saved this host
-      if (!this.savedHostNames.includes(host.hostname)) {
-        // Generate the host URL
-        let selectedHostURL = `http://${host.hostname}:${host.port}`;
-        // URI to get hostname directly from settings
-        var hostnameUri = `${selectedHostURL}/api/v2/instrument/settings/name`;
-        axios
-          .get(hostnameUri)
-          .then(response => {
-            // Get device name from response
-            var deviceName = response.data;
-            // We use unshift instead of push to add the entry to the beginning of the array
-            this.savedHosts.unshift({
-              name: deviceName,
-              hostname: host.hostname,
-              port: host.port
-            });
-          })
-          .catch(error => {
-            this.modalError(error); // Let mixin handle error
-          });
-      }
-    }
   }
 };
 </script>

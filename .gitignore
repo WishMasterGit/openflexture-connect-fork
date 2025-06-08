@@ -2,6 +2,7 @@
 node_modules
 /dist
 /dist-lite
+/out
 /app/dist
 /release-builds
 /installers/release-builds
