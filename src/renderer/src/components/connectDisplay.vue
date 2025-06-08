@@ -43,11 +43,7 @@
           <div v-if="!localMode">
             <div class="uk-inline uk-width-1-1">
               <label class="uk-form-label" for="form-stacked-text">Host</label>
-              <input
-                v-model="hostname"
-                class="uk-input uk-form-small"
-                type="text"
-              />
+              <input v-model="hostname" class="uk-input uk-form-small" type="text" />
             </div>
             <label class="uk-form-label" for="form-stacked-text">Port</label>
             <div class="uk-form-controls">
@@ -82,15 +78,12 @@
       </div>
     </div>
 
-    
-
     <!-- Nearby devices -->
     <ul uk-accordion="multiple: true; animation: false">
       <li id="nearby-connections-grid" class="uk-open">
         <a class="uk-accordion-title" href="#">Nearby devices</a>
         <div class="uk-accordion-content">
           <div class="uk-grid-medium uk-grid-match" uk-grid>
-            
             <div v-for="host in foundHostArray" :key="host.name">
               <hostCard
                 :name="host.name"
@@ -129,99 +122,96 @@
 </template>
 
 <script>
-import hostCard from "./connectComponents/hostCard.vue";
-import axios from "axios";
-import UIkit from "uikit";
+import hostCard from './connectComponents/hostCard.vue'
+import axios from 'axios'
+import UIkit from 'uikit'
 
 // Export main app
 export default {
-  name: "ConnectDisplay",
+  name: 'ConnectDisplay',
 
   components: {
     hostCard
   },
 
-  data: function() {
+  data: function () {
     return {
       localMode: true,
-      hostname: "microscope.local",
+      hostname: 'microscope.local',
       port: 5000,
       savedHosts: {},
       foundHosts: {},
       relaodTimer: null
-    };
+    }
   },
 
   computed: {
-    selectedHostURL: function() {
-      return `http://${this.hostname}:${this.port}`;
+    selectedHostURL: function () {
+      return `http://${this.hostname}:${this.port}`
     },
-    foundHostArray: function() {
-      return Object.values(this.foundHosts);
+    foundHostArray: function () {
+      return Object.values(this.foundHosts)
     },
-    savedHostArray: function() {
-      var hostnames = [];
-      return Object.values(this.savedHosts);
-    },
-    manualIPValid: function() {
-      const addr = ipaddr.isValid(this.hostname);
-      return addr;
+    savedHostArray: function () {
+      return Object.values(this.savedHosts)
     }
   },
 
   // When savedHosts changes, serialise to JSON and save to localStorage
-  watch: {
-  },
+  watch: {},
 
   mounted() {
     this.timer = setInterval(() => {
       this.reloadNearby()
     }, 10000)
-    this.foundHosts = window.api.getMicroscopes();
-    window.api.getSavedHosts().then(response => {
-      this.savedHosts = response;
-    }).catch(e => {
-      this.modalError(e);
-    });
+    this.foundHosts = window.api.getMicroscopes()
+    window.api
+      .getSavedHosts()
+      .then((response) => {
+        this.savedHosts = response
+      })
+      .catch((e) => {
+        this.modalError(e)
+      })
   },
 
   methods: {
-    reloadNearby: async function() {
-        window.api.findMicroscopes();
-        await new Promise(r => setTimeout(r, 2000));
-        this.foundHosts = window.api.getMicroscopes();
+    reloadNearby: async function () {
+      window.api.findMicroscopes()
+      await new Promise((r) => setTimeout(r, 2000))
+      this.foundHosts = window.api.getMicroscopes()
     },
-    getManualHost: function() {
+    getManualHost: function () {
       // Get the currently selected host object from the manual connect box
-      let hostname = this.hostname;
-      let port = this.port;
+      let hostname = this.hostname
+      let port = this.port
       // Handle auto-local-connect
       if (this.localMode) {
-        hostname = "localhost";
+        hostname = 'localhost'
       }
-      return { hostname: hostname, port: port };
+      return { hostname: hostname, port: port }
     },
-    buildHostURL: function(hostname, port) {
-        return window.api.buildHostURL(hostname, port);
+    buildHostURL: function (hostname, port) {
+      return window.api.buildHostURL(hostname, port)
     },
-    connectHost: function(host) {
+    connectHost: function (host) {
       // Set the remote connect box values
-      this.localMode = false;
-      this.hostname = host.hostname;
-      this.port = host.port;
+      this.localMode = false
+      this.hostname = host.hostname
+      this.port = host.port
       // Generate the host URL
-      let selectedHostURL = this.buildHostURL(host.hostname, host.port);
+      let selectedHostURL = this.buildHostURL(host.hostname, host.port)
       // Start the connecting spinner
-      UIkit.modal("#connecting-modal").show();
+      UIkit.modal('#connecting-modal').show()
       axios
         .get(`${selectedHostURL}/routes`)
         .finally(() => {
-          UIkit.modal("#connecting-modal").hide();
+          UIkit.modal('#connecting-modal').hide()
         })
-        .then(response => {
+        .then((response) => {
           // If the /api/v2 route is available
-          if (Object.keys(response.data).includes("/api/v2/")) {
-            window.open(selectedHostURL, 'modal');
+          if (Object.keys(response.data).includes('/api/v2/')) {
+            window.open(selectedHostURL, 'modal')
           } else {
             // Error and no-connect if API v2 is missing
             var ApiVersionError = `Your microscope is running an old API version.\
@@ -229,32 +219,38 @@ export default {
             <br><br>
             For API upgrades, burning the latest Raspbian-OpenFlexure to your SD card is recommended.\
             <br><br>
-            <b>Downloads and instructions can be found <a target="_blank" href="https://openflexure.org/projects/microscope/install">here</a></b>`;
-            this.modalDialog("API upgrade required", ApiVersionError);
+            <b>Downloads and instructions can be found <a target="_blank" href="https://openflexure.org/projects/microscope/install">here</a></b>`
+            this.modalDialog('API upgrade required', ApiVersionError)
           }
         })
-        .catch(error => {
-          this.modalError(error); // Let mixin handle error
-        });
+        .catch((error) => {
+          this.modalError(error) // Let mixin handle error
+        })
     },
-    saveHost: function(host) {
-      window.api.saveHost({hostname: host.hostname, port: host.port});
-      window.api.getSavedHosts().then(response => {
-        this.savedHosts = response;
-      }).catch(e => {
-        this.modalError(e);
-      });
+    saveHost: function (host) {
+      window.api.saveHost({ hostname: host.hostname, port: host.port })
+      window.api
+        .getSavedHosts()
+        .then((response) => {
+          this.savedHosts = response
+        })
+        .catch((e) => {
+          this.modalError(e)
+        })
     },
-    removeHost: function(host) {
-      window.api.removeSavedHost(host.hostname);
-      window.api.getSavedHosts().then(response => {
-        this.savedHosts = response;
-      }).catch(e => {
-        this.modalError(e);
-      });
+    removeHost: function (host) {
+      window.api.removeSavedHost(host.hostname)
+      window.api
+        .getSavedHosts()
+        .then((response) => {
+          this.savedHosts = response
+        })
+        .catch((e) => {
+          this.modalError(e)
+        })
     }
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

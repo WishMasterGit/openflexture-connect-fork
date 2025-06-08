@@ -1,4 +1,4 @@
-"use strict";
+'use strict'
 
 const mainTemplateStr = `{{> header}}
 
@@ -15,7 +15,7 @@ const mainTemplateStr = `{{> header}}
 {{/each}}
 
 
-`;
+`
 
 const headerTemplateStr = `{{#if isPatch~}}
 ##
@@ -41,7 +41,7 @@ const headerTemplateStr = `{{#if isPatch~}}
 {{~#if title}} "{{title}}"
 {{~/if}}
 {{~#if date}} ({{date}})
-{{/if}}`;
+{{/if}}`
 
 const commitTemplateStr = `*{{#if scope}} **{{scope}}:**
 {{~/if}} {{#if subject}}
@@ -102,7 +102,7 @@ const commitTemplateStr = `*{{#if scope}} **{{scope}}:**
     {{~/if}}
     {{~this.repository}}#{{this.issue}}
   {{~/if}}{{/each}}
-{{~/if}}`;
+{{~/if}}`
 
 module.exports = {
   writerOpts: {
@@ -110,4 +110,4 @@ module.exports = {
     headerPartial: headerTemplateStr,
     commitPartial: commitTemplateStr
   }
-};
+}

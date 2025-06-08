@@ -2,43 +2,43 @@ import { app, BrowserWindow, Menu, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../public/icon.png?asset'
-import path from 'path';
-import fs from 'fs';
+import path from 'path'
+import fs from 'fs'
 
 class connectStore {
   constructor() {
-    const userDataPath = app.getPath('userData');
-    this.filePath = path.join(userDataPath, 'store.json');
+    const userDataPath = app.getPath('userData')
+    this.filePath = path.join(userDataPath, 'store.json')
     try {
       // Try to read the file and parse it as JSON
-      this.data = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
+      this.data = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
     } catch (error) {
+      console.error(error)
       // If file read or parse fails, start with an empty object
-      this.data = {hosts: {}};
+      this.data = { hosts: {} }
     }
   }
   // Get a host from the store
   getHosts() {
-    return this.data.hosts;
+    return this.data.hosts
   }
   // Save a host to the store
-  saveHost(hostname, value){
-    this.data.hosts[hostname] = value;
-    this.save();
+  saveHost(hostname, value) {
+    this.data.hosts[hostname] = value
+    this.save()
   }
   // Remove a host from the store
   removeHost(hostname) {
-    delete this.data.hosts[hostname];
-    this.save();
+    delete this.data.hosts[hostname]
+    this.save()
   }
   // Save the current state to disk
   save() {
-    fs.writeFileSync(this.filePath, JSON.stringify(this.data));
+    fs.writeFileSync(this.filePath, JSON.stringify(this.data))
   }
 }
 
-let store = new connectStore();
-
+let store = new connectStore()
 
 function createWindow() {
   // Create the browser window.
@@ -53,25 +53,20 @@ function createWindow() {
     }
   })
 
-
   const menuTemplate = [
     {
-      label: "File",
-      submenu: [
-        { role: "quit" }
-      ],
+      label: 'File',
+      submenu: [{ role: 'quit' }]
     },
     {
-      label: "View",
-      submenu: [
-        { role: "reload" }
-      ],
+      label: 'View',
+      submenu: [{ role: 'reload' }]
     },
-    { role: "about" }
-  ];
-  
-  const menu = Menu.buildFromTemplate(menuTemplate);
-  mainWindow.setMenu(menu);
+    { role: 'about' }
+  ]
+
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  mainWindow.setMenu(menu)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -86,15 +81,15 @@ function createWindow() {
   }
 
   mainWindow.webContents.setWindowOpenHandler(() => {
-      return {
-        action: 'allow',
-        overrideBrowserWindowOptions: {
-            width: 1200,
-            height: 900,
-            icon: icon,
-        }
+    return {
+      action: 'allow',
+      overrideBrowserWindowOptions: {
+        width: 1200,
+        height: 900,
+        icon: icon
       }
-    })
+    }
+  })
 }
 
 // This method will be called when Electron has finished
@@ -112,12 +107,12 @@ app.whenReady().then(() => {
   })
 
   ipcMain.on('saveHost', (event, hostData) => {
-    store.saveHost(hostData.hostname, hostData);
+    store.saveHost(hostData.hostname, hostData)
   })
   ipcMain.on('removeHost', (event, hostname) => {
-    store.removeHost(hostname);
+    store.removeHost(hostname)
   })
-  ipcMain.handle('getHosts', (event) => {
+  ipcMain.handle('getHosts', () => {
     return store.getHosts()
   })
   createWindow()
@@ -138,36 +133,34 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on("browser-window-created", (e, win) => {
+app.on('browser-window-created', (e, win) => {
   const menuTemplate = [
     {
-      label: "File",
-      submenu: [
-        { role: "close" }
-      ],
+      label: 'File',
+      submenu: [{ role: 'close' }]
     },
     {
-      label: "View",
+      label: 'View',
       submenu: [
-        { role: "reload" },
-        { role: "forceReload" },
-        { type: "separator" },
-        { role: "togglefullscreen" }
-      ],
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
     },
-    { role: "about" }
-  ];
-  
-  const menu = Menu.buildFromTemplate(menuTemplate);
-  win.setMenu(menu);
-});
+    { role: 'about' }
+  ]
+
+  const menu = Menu.buildFromTemplate(menuTemplate)
+  win.setMenu(menu)
+})
 
 app.setAboutPanelOptions({
-  applicationName: "OpenFlexureConnect",
+  applicationName: 'OpenFlexureConnect',
   iconPath: icon,
   applicationVersion: app.getVersion(),
   //credits is for Windows and MacOS, authors for Linux
-  credits: "The OpenFlexure Project (openflexure.org)",
-  authors: ["The OpenFlexure Project (openflexure.org)"],
-  copyright: "Distributed under the GNU GPL v3 license."
-});
+  credits: 'The OpenFlexure Project (openflexure.org)',
+  authors: ['The OpenFlexure Project (openflexure.org)'],
+  copyright: 'Distributed under the GNU GPL v3 license.'
+})

@@ -1,12 +1,10 @@
-
-
 import { createApp } from 'vue'
 import App from './App.vue'
-import UIkit from "uikit";
+import UIkit from 'uikit'
 
 const mixin = {
   methods: {
-    modalDialog: function(title, message) {
+    modalDialog: function (title, message) {
       UIkit.modal.dialog(
         `
         <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -18,40 +16,39 @@ const mixin = {
         </div>
         `,
         { stack: true }
-      );
+      )
     },
-    modalError: function(error) {
-      var errormsg = "";
+    modalError: function (error) {
+      var errormsg = ''
       // If a response was obtained
       if (error.response) {
         // If the response is a nicely formatted JSON response from the server
         if (error.response.data.message) {
-          errormsg = `${error.response.status}: ${error.response.data.message}`;
-          console.error(errormsg);
+          errormsg = `${error.response.status}: ${error.response.data.message}`
+          console.error(errormsg)
         }
         // If the response is just some generic error response
         else {
-          errormsg = `${error.response.status}: ${error.response.data}`;
-          console.error(errormsg);
+          errormsg = `${error.response.status}: ${error.response.data}`
+          console.error(errormsg)
         }
         // If the error occured during the request
       } else if (error.request) {
-        errormsg = `${error.message}`;
-        console.error(errormsg);
+        errormsg = `${error.message}`
+        console.error(errormsg)
         // Everything else
       } else {
-        errormsg = `${error.message}`;
-        console.error(errormsg);
+        errormsg = `${error.message}`
+        console.error(errormsg)
       }
       UIkit.notification({
         message: `${errormsg}`,
-        status: "danger"
-      });
+        status: 'danger'
+      })
     }
   }
-};
-  
+}
 
 const app = createApp(App)
-app.mixin(mixin);
+app.mixin(mixin)
 app.mount('#app')
