@@ -181,7 +181,7 @@ export default {
     window.api.getSavedHosts().then(response => {
       this.savedHosts = response;
     }).catch(e => {
-      console.error(e);
+      this.modalError(e);
     });
   },
 
@@ -234,8 +234,7 @@ export default {
           }
         })
         .catch(error => {
-          //this.modalError(error); // Let mixin handle error
-          console.log(error);
+          this.modalError(error); // Let mixin handle error
         });
     },
     saveHost: function(host) {
@@ -243,7 +242,7 @@ export default {
       window.api.getSavedHosts().then(response => {
         this.savedHosts = response;
       }).catch(e => {
-        console.error(e);
+        this.modalError(e);
       });
     },
     removeHost: function(host) {
@@ -251,7 +250,7 @@ export default {
       window.api.getSavedHosts().then(response => {
         this.savedHosts = response;
       }).catch(e => {
-        console.error(e);
+        this.modalError(e);
       });
     }
   }
