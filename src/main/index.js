@@ -44,7 +44,7 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+  mainWindow.webContents.setWindowOpenHandler(() => {
       return {
         action: 'allow',
         overrideBrowserWindowOptions: {
@@ -110,4 +110,14 @@ app.on("browser-window-created", (e, win) => {
   
   const menu = Menu.buildFromTemplate(menuTemplate);
   win.setMenu(menu);
+});
+
+app.setAboutPanelOptions({
+  applicationName: "OpenFlexureConnect",
+  iconPath: icon,
+  applicationVersion: app.getVersion(),
+  //credits is for Windows and MacOS, authors for Linux
+  credits: "The OpenFlexure Project (openflexure.org)",
+  authors: ["The OpenFlexure Project (openflexure.org)"],
+  copyright: "Distributed under the GNU GPL v3 license."
 });

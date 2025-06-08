@@ -1,5 +1,5 @@
 
-import { contextBridge, Menu } from 'electron'
+import { contextBridge} from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import ipaddr  from 'ipaddr.js'
 import mdns from 'mdns-js'
