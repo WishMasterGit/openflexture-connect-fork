@@ -31,5 +31,4 @@ yarn-error.log*
 hooks
 platforms
 ./webpack.config.js
-#Electron-builder output
-/dist_electron
+

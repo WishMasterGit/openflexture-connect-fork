@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: openflexure.connect
 productName: openflexure-connect
 directories:
   buildResources: build
@@ -32,11 +32,11 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer: openflexure
+  category: Science
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://build.openflexure.org/openflexure-connect

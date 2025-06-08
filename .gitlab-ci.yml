@@ -36,20 +36,22 @@ build:
     - eslint
 
   script:
-    # Build electron app
-    - npm run electron:release
+    # Build electron app (cannot build on MacOS in linux)
+    - npm run build
+    - npm run build:linux
+    - npm run build:win
 
   artifacts:
-    name: "dist_electron"
+    name: "dist"
     expire_in: 1 week
     paths:
-      - "./dist_electron/*.AppImage"
-      - "./dist_electron/*.snap"
-      - "./dist_electron/*.exe"
-      - "./dist_electron/*.appx"
-      - "./dist_electron/*.exe.blockmap"
-      - "./dist_electron/*.yml"
-      - "./dist_electron/*.yaml"
+      - "./dist/*.AppImage"
+      - "./dist/*.snap"
+      - "./dist/*.exe"
+      - "./dist/*.appx"
+      - "./dist/*.exe.blockmap"
+      - "./dist/*.yml"
+      - "./dist/*.yaml"
 
   only:
     - merge_requests
@@ -76,7 +78,7 @@ deploy:
     - 'which rsync || ( apt-get update -y && apt-get install rsync -y )'
     
     # Upload the builds folder to openflexure-microscope builds 
-    - rsync -hrvz -e ssh dist_electron/ ci-user@openflexure.bath.ac.uk:/var/www/build/openflexure-ev/
+    - rsync -hrvz -e ssh dist/ ci-user@openflexure.bath.ac.uk:/var/www/build/openflexure-ev/
     
     # Run update-latest.py on the build server
     - ssh -t ci-user@openflexure.bath.ac.uk "/var/www/build/update-latest.py"

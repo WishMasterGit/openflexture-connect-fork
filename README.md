@@ -18,7 +18,7 @@ This includes basic installation instructions suitable for most users.
 	* `npm version X.y.z` (replace X.y.z with a semantic version number)
 	* or `npm version {patch/minor/major}` (see https://docs.npmjs.com/cli/v6/commands/npm-version)
 	* Git commit and git push
-* Create a new version tag on GitLab (e.g. V1.2.0)
+* Create a new version tag on GitLab (e.g. v5.0.0)
 	* Make sure you prefix a lower case 'v', otherwise it won't be recognised as a release!
 	* This will trigger a CI pipeline that builds the electron app, and deploys it
         * Note: This also updates the build servers nginx redirect map file
@@ -33,21 +33,24 @@ This includes basic installation instructions suitable for most users.
 
 ## Local installation
 
+* Node 22 is required. If you have `nvm` installed run `nvm use 22`
 * Clone the repo, and run `npm install`
 
 Scripts to build, and package Electron apps, are included in `package.json`
 
-### Build for your local operating system
+### Build locally
 
-* `npm run electron:build`
+* `npm run build` will build the javascript.
+* To build exectuables run `build:win`, or `build:mac` or `build:linux`
 
 ### Debug on your local operating system
 
 You can launch the app with Vue debug tools and hot-reload enabled with:
 
-* `npm run electron:serve`
+* `npm run dev`
 
-## Developer notes
+The DevTools can be brought up with F12
+
 
 ### VS Code and ESLint
 
