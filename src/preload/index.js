@@ -1,16 +1,16 @@
 
-import { contextBridge} from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import ipaddr  from 'ipaddr.js'
 import mdns from 'mdns-js'
 
-let connect_api = {
+
+let connectApi = {
     foundHosts: {},
     getMicroscopes: function() {
         return this.foundHosts
     },
     findMicroscopes: function() {
-        
         // Create a browser to search for 'openflexure' type services
         var browser = mdns.createBrowser(mdns.tcp("openflexure"));
 
@@ -47,20 +47,23 @@ let connect_api = {
           }
         }
         return `http://${hostname}:${port}`;
-    }
+    },
+    saveHost: (hostData) => ipcRenderer.send('saveHost', hostData),
+    getSavedHosts: () => ipcRenderer.invoke('getHosts'),
+    removeSavedHost: (hostname) => ipcRenderer.send('removeHost', hostname)
 }
-connect_api.findMicroscopes()
+connectApi.findMicroscopes()
 
 
 
 if (process.contextIsolated) {
     try {
       contextBridge.exposeInMainWorld('electron', electronAPI)
-      contextBridge.exposeInMainWorld('api', connect_api)
+      contextBridge.exposeInMainWorld('api', connectApi)
     } catch (error) {
       console.error(error)
     }
   } else {
     window.electron = electronAPI
-    window.api = connect_api
+    window.api = connectApi
   }

@@ -118,7 +118,7 @@
         <a class="uk-accordion-title" href="#">Saved devices</a>
         <div class="uk-accordion-content">
           <div class="uk-grid-medium uk-grid-match" uk-grid>
-            <div v-for="host in savedHosts" :key="host.name">
+            <div v-for="host in savedHostArray" :key="host.name">
               <hostCard
                 :name="host.name"
                 :hostname="host.hostname"
@@ -154,7 +154,7 @@ export default {
       localMode: true,
       hostname: "microscope.local",
       port: 5000,
-      savedHosts: [],
+      savedHosts: {},
       foundHosts: {}
     };
   },
@@ -166,12 +166,9 @@ export default {
     foundHostArray: function() {
       return Object.values(this.foundHosts);
     },
-    savedHostNames: function() {
+    savedHostArray: function() {
       var hostnames = [];
-      for (var host of this.savedHosts) {
-        hostnames.push(host.hostname);
-      }
-      return hostnames;
+      return Object.values(this.savedHosts);
     },
     manualIPValid: function() {
       const addr = ipaddr.isValid(this.hostname);
@@ -185,11 +182,17 @@ export default {
 
   mounted() {
     this.foundHosts = window.api.getMicroscopes();
+    window.api.getSavedHosts().then(response => {
+      this.savedHosts = response;
+    }).catch(e => {
+      console.error(e);
+    });
   },
 
   methods: {
-    reloadNearby: function() {
+    reloadNearby: async function() {
         window.api.findMicroscopes();
+        await setTimeout(2000);
         this.foundHosts = window.api.getMicroscopes();
     },
     getManualHost: function() {
@@ -239,6 +242,22 @@ export default {
           console.log(error);
         });
     },
+    saveHost: function(host) {
+      window.api.saveHost({hostname: host.hostname, port: host.port});
+      window.api.getSavedHosts().then(response => {
+        this.savedHosts = response;
+      }).catch(e => {
+        console.error(e);
+      });
+    },
+    removeHost: function(host) {
+      window.api.removeSavedHost(host.hostname);
+      window.api.getSavedHosts().then(response => {
+        this.savedHosts = response;
+      }).catch(e => {
+        console.error(e);
+      });
+    }
   }
 };
 </script>

@@ -1,8 +1,43 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, Menu, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../public/icon.png?asset'
+import path from 'path';
+import fs from 'fs';
 
+class connectStore {
+  constructor() {
+    const userDataPath = app.getPath('userData');
+    this.filePath = path.join(userDataPath, 'store.json');
+    try {
+      // Try to read the file and parse it as JSON
+      this.data = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
+    } catch (error) {
+      // If file read or parse fails, start with an empty object
+      this.data = {hosts: {}};
+    }
+  }
+  // Get a host from the store
+  getHosts() {
+    return this.data.hosts;
+  }
+  // Save a host to the store
+  saveHost(hostname, value){
+    this.data.hosts[hostname] = value;
+    this.save();
+  }
+  // Remove a host from the store
+  removeHost(hostname) {
+    delete this.data.hosts[hostname];
+    this.save();
+  }
+  // Save the current state to disk
+  save() {
+    fs.writeFileSync(this.filePath, JSON.stringify(this.data));
+  }
+}
+
+let store = new connectStore();
 
 
 function createWindow() {
@@ -24,6 +59,12 @@ function createWindow() {
       label: "File",
       submenu: [
         { role: "quit" }
+      ],
+    },
+    {
+      label: "View",
+      submenu: [
+        { role: "reload" }
       ],
     },
     { role: "about" }
@@ -70,6 +111,15 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  ipcMain.on('saveHost', (event, hostData) => {
+    store.saveHost(hostData.hostname, hostData);
+  })
+  ipcMain.on('removeHost', (event, hostname) => {
+    store.removeHost(hostname);
+  })
+  ipcMain.handle('getHosts', (event) => {
+    return store.getHosts()
+  })
   createWindow()
 
   app.on('activate', function () {
