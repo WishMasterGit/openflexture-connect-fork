@@ -1,14 +1,12 @@
 <template>
   <div id="app" class="uk-height-1-1 uk-margin-remove uk-padding-remove">
     <connectDisplay />
-    <!--<versions />-->
   </div>
 </template>
 
 <script>
 // Import components
 import connectDisplay from './components/connectDisplay.vue'
-//import versions from "./components/Versions.vue";
 
 // Export main app
 export default {
@@ -16,7 +14,6 @@ export default {
 
   components: {
     connectDisplay
-    //versions
   },
 
   data: function () {

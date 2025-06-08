@@ -157,7 +157,6 @@ export default {
     }
   },
 
-  // When savedHosts changes, serialise to JSON and save to localStorage
   watch: {},
 
   mounted() {
