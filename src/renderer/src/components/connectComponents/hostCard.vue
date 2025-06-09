@@ -61,12 +61,11 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios'
 
 // Export main app
 export default {
-  name: "HostCard",
-
+  name: 'HostCard',
   props: {
     name: {
       type: String,
@@ -96,105 +95,105 @@ export default {
       default: true
     }
   },
-
-  data: function() {
+  emits: ['connect', 'delete', 'save', 'available', 'unavailable'],
+  data: function () {
     return {
-      snapshotRule: "/api/v2/streams/snapshot",
-      snapshotSrc: "",
+      snapshotRule: '/api/v2/streams/snapshot',
+      snapshotSrc: '',
       snapshotAvailable: false,
       polling: null
-    };
+    }
   },
 
   computed: {
-    routesURL: function() {
-      return `http://${this.hostname}:${this.port}/routes`;
+    routesURL: function () {
+      return `http://${this.hostname}:${this.port}/routes`
     },
-    snapshotURL: function() {
-      return `http://${this.hostname}:${this.port}${this.snapshotRule}`;
+    snapshotURL: function () {
+      return `http://${this.hostname}:${this.port}${this.snapshotRule}`
     },
-    shouldShow: function() {
+    shouldShow: function () {
       if (this.hideIfUnavailable && !this.snapshotAvailable) {
-        return false;
+        return false
       } else {
-        return true;
+        return true
       }
     }
   },
 
   mounted() {
     // Try to load the microscope snapshot when mounted
-    this.checkSnapshotAvailable();
+    this.checkSnapshotAvailable()
   },
 
-  beforeDestroy() {
+  beforeUnmount() {
     // Clear the polling timer
     if (this.polling !== null) {
-      clearInterval(this.polling);
+      clearInterval(this.polling)
     }
   },
 
   methods: {
-    checkSnapshotAvailable: function() {
+    checkSnapshotAvailable: function () {
       // Fetches the list of routes from the host, and starts
       // a snapshot timer if the snapshot route is available
 
       // Send tag request
       axios
         .get(this.routesURL)
-        .then(response => {
+        .then((response) => {
           // If the host has a snapshot route available
           if (this.snapshotRule in response.data) {
             // Tell the view that a snapshot is available
-            this.setAvailability(true);
+            this.setAvailability(true)
             // Update the snapshot URL
-            this.updateSnapshotURL();
+            this.updateSnapshotURL()
             // If not already polling, start polling
             if (this.polling === null) {
-              this.updateSnapshotPoll();
+              this.updateSnapshotPoll()
             }
           }
         })
         .catch(() => {
           // Tell the view that a snapshot is not available, and ignore
-          this.setAvailability(false);
-        });
+          this.setAvailability(false)
+        })
     },
 
-    updateSnapshotURL: function() {
+    updateSnapshotURL: function () {
       // Set the snapshot image src to the snapshot URL,
       // adding a timestamp argument to act as a cache-breaker
-      var candidatesnapshotSrc = `${this.snapshotURL}?${Date.now()}`;
+      var candidatesnapshotSrc = `${this.snapshotURL}?${Date.now()}`
 
       axios
         .head(candidatesnapshotSrc)
         .then(() => {
-          this.setAvailability(true);
-          this.snapshotSrc = candidatesnapshotSrc;
+          this.setAvailability(true)
+          this.snapshotSrc = candidatesnapshotSrc
         })
         .catch(() => {
-          console.log("Snapshot unavailable");
-          this.setAvailability(false);
-        });
+          console.log('Snapshot unavailable')
+          this.setAvailability(false)
+        })
     },
 
-    updateSnapshotPoll: function() {
+    updateSnapshotPoll: function () {
       // Start a timer to call updateSnapshotURL periodically
       this.polling = setInterval(() => {
-        this.updateSnapshotURL();
-      }, 15000);
+        this.updateSnapshotURL()
+      }, 15000)
     },
 
-    setAvailability: function(availability) {
-      this.snapshotAvailable = availability;
+    setAvailability: function (availability) {
+      this.snapshotAvailable = availability
       if (availability === true) {
-        this.$emit("available");
+        this.$emit('available')
       } else {
-        this.$emit("unavailable");
+        this.$emit('unavailable')
       }
     }
   }
-};
+}
 </script>
 
 <style>
@@ -209,7 +208,7 @@ export default {
   height: 225px;
 }
 
-img[data-src][src*="data:image"] {
+img[data-src][src*='data:image'] {
   background: rgba(127, 127, 127, 0.1);
 }
 </style>

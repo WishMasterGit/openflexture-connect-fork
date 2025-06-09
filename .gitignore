@@ -2,10 +2,12 @@
 node_modules
 /dist
 /dist-lite
+/out
 /app/dist
 /release-builds
 /installers/release-builds
 /choco/release
+.eslintcache
 
 # local env files
 .env.local
@@ -29,5 +31,4 @@ yarn-error.log*
 hooks
 platforms
 ./webpack.config.js
-#Electron-builder output
-/dist_electron
+

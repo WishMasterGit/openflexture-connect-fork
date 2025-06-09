@@ -6,37 +6,37 @@
 
 <script>
 // Import components
-import connectDisplay from "./components/connectDisplay.vue";
+import connectDisplay from './components/connectDisplay.vue'
 
 // Export main app
 export default {
-  name: "App",
+  name: 'App',
 
   components: {
     connectDisplay
   },
 
-  data: function() {
-    return {};
+  data: function () {
+    return {}
   },
 
   computed: {},
 
   mounted() {},
 
-  created: function() {},
+  created: function () {},
 
-  beforeDestroy: function() {},
+  beforeUnmount: function () {},
 
   methods: {}
-};
+}
 </script>
 
 <style lang="less">
 // Basic UIkit CSS
-@import "../node_modules/uikit/src/less/uikit.less";
+@import '../../../node_modules/uikit/src/less/uikit.less';
 // Custom UIkit CSS modifications
-@import "./assets/less/theme.less";
+@import './assets/less/theme.less';
 
 #app {
   -webkit-font-smoothing: antialiased;
