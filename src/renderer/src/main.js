@@ -32,7 +32,7 @@ const mixin = {
           errormsg = `${error.response.status}: ${error.response.data}`
           console.error(errormsg)
         }
-        // If the error occured during the request
+        // If the error occurred during the request
       } else if (error.request) {
         errormsg = `${error.message}`
         console.error(errormsg)
