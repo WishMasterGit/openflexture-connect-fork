@@ -43,6 +43,8 @@ Scripts to build, and package Electron apps, are included in `package.json`
 * `npm run build` will build the javascript.
 * To build exectuables run `build:win`, or `build:mac` or `build:linux`
 
+Please note that the macOS build is not checked by our CI. If anyone can offer help with macOS packaging or testeing it would be appreciated.
+
 ### Debug on your local operating system
 
 You can launch the app with Vue debug tools and hot-reload enabled with:

@@ -1,5 +1,4 @@
 import { app, BrowserWindow, Menu, ipcMain } from 'electron'
-import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../public/icon.png?asset'
 import path from 'path'
@@ -48,12 +47,12 @@ function createWindow() {
     show: false,
     icon: icon,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: path.join(__dirname, '../preload/index.js'),
       sandbox: false
     }
   })
 
-  const menuTemplate = [
+  const mainMenuTemplate = [
     {
       label: 'File',
       submenu: [{ role: 'quit' }]
@@ -65,7 +64,7 @@ function createWindow() {
     { role: 'about' }
   ]
 
-  const menu = Menu.buildFromTemplate(menuTemplate)
+  const menu = Menu.buildFromTemplate(mainMenuTemplate)
   mainWindow.setMenu(menu)
 
   mainWindow.on('ready-to-show', () => {
@@ -77,7 +76,7 @@ function createWindow() {
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'))
   }
 
   mainWindow.webContents.setWindowOpenHandler(() => {
@@ -134,7 +133,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('browser-window-created', (e, win) => {
-  const menuTemplate = [
+  const microscopeMenuTemplate = [
     {
       label: 'File',
       submenu: [{ role: 'close' }]
@@ -151,7 +150,7 @@ app.on('browser-window-created', (e, win) => {
     { role: 'about' }
   ]
 
-  const menu = Menu.buildFromTemplate(menuTemplate)
+  const menu = Menu.buildFromTemplate(microscopeMenuTemplate)
   win.setMenu(menu)
 })
 

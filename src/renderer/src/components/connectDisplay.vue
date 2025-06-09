@@ -141,7 +141,7 @@ export default {
       port: 5000,
       savedHosts: {},
       foundHosts: {},
-      relaodTimer: null
+      timer: null,
     }
   },
 
@@ -172,6 +172,13 @@ export default {
       .catch((e) => {
         this.modalError(e)
       })
+  },
+
+  beforeUnmount() {
+    // Clear the timer
+    if (this.timer !== null) {
+      clearInterval(this.timer)
+    }
   },
 
   methods: {
