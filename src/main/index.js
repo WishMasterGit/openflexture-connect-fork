@@ -59,7 +59,11 @@ function createWindow() {
     },
     {
       label: 'View',
-      submenu: [{ role: 'reload' }]
+      submenu: [
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I'}
+      ]
     },
     { role: 'about' }
   ]
@@ -98,13 +102,6 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
   ipcMain.on('saveHost', (event, hostData) => {
     store.saveHost(hostData.hostname, hostData)
   })
@@ -141,10 +138,11 @@ app.on('browser-window-created', (e, win) => {
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        { role: 'toggledevtools', accelerator: 'CmdOrCtrl+Shift+I'},
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'togglefullscreen', accelerator: 'F11' },
       ]
     },
     { role: 'about' }
