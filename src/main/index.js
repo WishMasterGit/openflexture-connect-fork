@@ -143,6 +143,7 @@ app.on('browser-window-created', (e, win) => {
       submenu: [
         { role: 'reload' },
         { role: 'forceReload' },
+        { role: 'toggledevtools'},
         { type: 'separator' },
         { role: 'togglefullscreen' }
       ]
