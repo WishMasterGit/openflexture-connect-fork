@@ -59,7 +59,10 @@ function createWindow() {
     },
     {
       label: 'View',
-      submenu: [{ role: 'reload' }]
+      submenu: [
+        { role: 'reload' },
+        { role: 'toggledevtools'}
+      ]
     },
     { role: 'about' }
   ]
