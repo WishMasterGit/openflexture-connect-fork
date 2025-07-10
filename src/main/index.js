@@ -141,8 +141,9 @@ app.on('browser-window-created', (e, win) => {
       submenu: [
         { role: 'reload', accelerator: 'CmdOrCtrl+R' },
         { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+{ role: 'togglefullscreen', accelerator: 'F11', visible: false, acceleratorWorksWhenHidden : true },
+        { type: 'separator' },
         { role: 'toggledevtools', accelerator: 'CmdOrCtrl+Shift+I'},
-        { role: 'togglefullscreen', accelerator: 'F11', visible: false, acceleratorWorksWhenHidden : true },
       ]
     },
     { role: 'about' }
