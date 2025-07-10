@@ -62,6 +62,7 @@ function createWindow() {
       submenu: [
         { role: 'reload', accelerator: 'CmdOrCtrl+R' },
         { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        { type: 'separator' },
         { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I'}
       ]
     },
