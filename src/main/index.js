@@ -133,6 +133,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('browser-window-created', (e, win) => {
+  win.maximize();
   const microscopeMenuTemplate = [
     {
       label: 'File',
