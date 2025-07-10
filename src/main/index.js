@@ -141,8 +141,7 @@ app.on('browser-window-created', (e, win) => {
         { role: 'reload', accelerator: 'CmdOrCtrl+R' },
         { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
         { role: 'toggledevtools', accelerator: 'CmdOrCtrl+Shift+I'},
-        { type: 'separator' },
-        { role: 'togglefullscreen', accelerator: 'F11' },
+        { role: 'togglefullscreen', accelerator: 'F11', visible: false, acceleratorWorksWhenHidden : true },
       ]
     },
     { role: 'about' }
