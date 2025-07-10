@@ -1,5 +1,5 @@
 import { app, BrowserWindow, Menu, ipcMain } from 'electron'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { electronApp, is } from '@electron-toolkit/utils'
 import icon from '../../public/icon.png?asset'
 import path from 'path'
 import fs from 'fs'
@@ -59,7 +59,12 @@ function createWindow() {
     },
     {
       label: 'View',
-      submenu: [{ role: 'reload' }]
+      submenu: [
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        { type: 'separator' },
+        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I'}
+      ]
     },
     { role: 'about' }
   ]
@@ -98,13 +103,6 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
-
   ipcMain.on('saveHost', (event, hostData) => {
     store.saveHost(hostData.hostname, hostData)
   })
@@ -141,10 +139,11 @@ app.on('browser-window-created', (e, win) => {
     {
       label: 'View',
       submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+{ role: 'togglefullscreen', accelerator: 'F11', visible: false, acceleratorWorksWhenHidden : true },
         { type: 'separator' },
-        { role: 'togglefullscreen' }
+        { role: 'toggledevtools', accelerator: 'CmdOrCtrl+Shift+I'},
       ]
     },
     { role: 'about' }
