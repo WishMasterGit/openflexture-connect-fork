@@ -2,6 +2,7 @@ include:
   - project: 'openflexure/ci-templates'
     file: '/javascript.yml'
 
+# Feed parameters into the javascript job
 .node_install:
   extends: .javascript
   variables:
