@@ -15,6 +15,14 @@ stages:
   - build
   - deploy
 
+trigger_pipeline:
+  stage: analysis
+
+  script:
+    - echo "Dummy job for merge-request"
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
   extends: .node_install
