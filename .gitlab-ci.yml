@@ -1,36 +1,31 @@
+include:
+  - project: 'openflexure/ci-templates'
+    file: '/javascript.yml'
+
+.node_install:
+  extends: .javascript
+  variables:
+    JS_IMAGE: electronuserland/builder:22-wine-mono
+    JS_PATH: .
+    JS_CACHE_PATH: node_modules
+
 stages:
   - analysis
   - build
   - deploy
 
-# Re-usable block to install (and cache) openflexure-microscope-server static app
-.node-job:
-  image: electronuserland/builder:22-wine-mono
-  before_script:
-    - npm install
-  cache:
-    key: "${CI_COMMIT_REF_SLUG}"
-    paths:
-      - node_modules
-
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
-  extends: .node-job
+  extends: .node_install
   stage: analysis
 
   script:
     # Build JS application for production
     - npm run lint
 
-  only:
-    - branches
-    - merge_requests
-    - tags
-    - web
-
 # Electron app build
 build:
-  extends: .node-job
+  extends: .node_install
   stage: build
   dependencies:
     - eslint
@@ -52,11 +47,6 @@ build:
       - "./dist/*.exe.blockmap"
       - "./dist/*.yml"
       - "./dist/*.yaml"
-
-  only:
-    - merge_requests
-    - web
-    - tags
 
 
 # Deploy to builds.openflexure.org
@@ -83,6 +73,9 @@ deploy:
     # Run update-latest.py on the build server
     - ssh -t ci-user@openflexure.bath.ac.uk "/var/www/build/update-latest.py"
     
-  only:
-    - /^v(\d+\.)*\d+$/  # Stable versions (e.g. no prerelease suffix)
-    - web  # Allow force publish via web
+  rules:
+    # Stable versions (e.g. no prerelease suffix)
+    - if: '$CI_COMMIT_TAG =~ /^v(\d+\.)*\d+$/'
+    # Allow force publish via web
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - when: never
