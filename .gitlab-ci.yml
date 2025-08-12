@@ -48,7 +48,6 @@ build:
       - "./dist/*.yml"
       - "./dist/*.yaml"
 
-
 # Deploy to builds.openflexure.org
 deploy:
   stage: deploy
