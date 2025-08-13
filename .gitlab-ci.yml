@@ -33,7 +33,14 @@ eslint:
   extends: .node_install
   stage: analysis
   rules:
+    # Add new rule first as the rules defined in .node_install
+    # end in when: never, so if this new rule goes after that
+    # clause, it will never be reached as rules are 
+    # evaluated top to bottom
     - if: $CI_COMMIT_BRANCH
+    # This syntax means we append the rules from the .node_install
+    # job to this job, instead of overwriting them by creating
+    # this new rules section
     - !reference [.node_install, rules]
   script:
     # Build JS application for production
