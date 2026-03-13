@@ -145,6 +145,18 @@ function createMainWindow() {
     // Remove from map when closed
     childWindow.on('closed', () => {
       childWindows.delete(url);
+
+      // If main is hidden and no children remain, quit app
+      const remainingChildren = Array.from(childWindows.values()).some(
+        (win) => !win.isDestroyed()
+      );
+
+      if (!remainingChildren) {
+        const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+        if (mainWindow && mainWindow.isVisible() === false) {
+          app.quit();
+        }
+      }
     });
 
     // Set menu for child windows
