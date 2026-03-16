@@ -1,0 +1,8 @@
+[codespell]
+
+skip = ./node_modules,
+       *-lock.json,
+       ./.git,
+       ./build,
+       ./dist,
+       ./out

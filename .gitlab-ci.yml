@@ -28,7 +28,7 @@ codespell:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
   script:
     - pip install codespell
-    - codespell --skip "./node_modules,./dist,./out,./build,./package-lock.json"
+    - codespell
 
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
