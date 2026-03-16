@@ -20,6 +20,16 @@ stages:
   - build
   - deploy
 
+codespell:
+  stage: analysis
+  image: python:3.11-slim
+  rules:
+  - if: $CI_PIPELINE_SOURCE == "push"
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  script:
+    - pip install codespell
+    - codespell
+
 # JavaScript linting with ESLint (via Vue CLI)
 eslint:
   extends: .node_install

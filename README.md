@@ -28,7 +28,7 @@ This includes basic installation instructions suitable for most users.
 * Binaries will be built for testing on merge requests, and manual CI triggers
     * These builds expire after a week, and are intended for testing only.
 * Binaries will be built **and deployed** on release tags.
-    * These binaries will expire on GitLab after a week, but will be permanantly
+    * These binaries will expire on GitLab after a week, but will be permanently
     deployed to http://build.openflexure.org/openflexure-ev
 
 ## Local installation
@@ -41,9 +41,9 @@ Scripts to build, and package Electron apps, are included in `package.json`
 ### Build locally
 
 * `npm run build` will build the javascript.
-* To build exectuables run `build:win`, or `build:mac` or `build:linux`
+* To build executables run `build:win`, or `build:mac` or `build:linux`
 
-Please note that the macOS build is not checked by our CI. If anyone can offer help with macOS packaging or testeing it would be appreciated.
+Please note that the macOS build is not checked by our CI. If anyone can offer help with macOS packaging or testing it would be appreciated.
 
 ### Debug on your local operating system
 
