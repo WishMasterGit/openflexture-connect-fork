@@ -4,6 +4,13 @@ import icon from '../../public/icon.png?asset'
 import path from 'path'
 import fs from 'fs'
 
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+  process.exit(0)
+}
+
 class connectStore {
   constructor() {
     const userDataPath = app.getPath('userData')
@@ -138,6 +145,18 @@ function createMainWindow() {
     // Remove from map when closed
     childWindow.on('closed', () => {
       childWindows.delete(url);
+
+      // If main is hidden and no children remain, quit app
+      const remainingChildren = Array.from(childWindows.values()).some(
+        (win) => !win.isDestroyed()
+      );
+
+      if (!remainingChildren) {
+        const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+        if (mainWindow && mainWindow.isVisible() === false) {
+          app.quit();
+        }
+      }
     });
 
     // Set menu for child windows
@@ -173,6 +192,24 @@ function createMainWindow() {
 }
 
 let tray = null
+
+app.on('second-instance', () => {
+  const child = Array.from(childWindows.values()).find(w => !w.isDestroyed())
+
+  if (child) {
+    if (child.isMinimized()) child.restore()
+    child.focus()
+    return
+  }
+
+  const windows = BrowserWindow.getAllWindows()
+  if (windows.length > 0) {
+    const mainWindow = windows[0]
+    mainWindow.setSkipTaskbar(false)
+    mainWindow.show()
+    mainWindow.focus()
+  }
+})
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron');
