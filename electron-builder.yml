@@ -50,7 +50,6 @@ linux:
     - target: snap
       arch:
         - x64
-        - arm64
   maintainer: openflexure
   category: Science
 appImage:
