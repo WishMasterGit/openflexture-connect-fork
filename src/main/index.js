@@ -215,7 +215,6 @@ app.on('second-instance', () => {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron');
 
-  initUpdater()
 
   ipcMain.on('saveHost', (event, hostData) => {
     store.saveHost(hostData.hostname, hostData);
@@ -228,6 +227,13 @@ app.whenReady().then(() => {
   ipcMain.handle('getHosts', () => store.getHosts());
 
   const mainWindow = createMainWindow();
+
+  // Check for updates 2s after window opens
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      initUpdater(mainWindow);
+    }, 2000);
+  });
 
   // Create tray icon
   tray = new Tray(icon); // Use your icon here
