@@ -49,93 +49,7 @@ let store = new connectStore()
 
 // Map to track child windows by URL
 const childWindows = new Map()
-let aboutWindow = null
 
-function createAboutWindow(parentWindow) {
-  if (aboutWindow && !aboutWindow.isDestroyed()) {
-    aboutWindow.focus()
-    return
-  }
-
-  const primaryDisplay = screen.getPrimaryDisplay()
-  const { width, height } = primaryDisplay.workAreaSize
-
-  aboutWindow = new BrowserWindow({
-    width: Math.round(width * 0.4),
-    height: Math.round(height * 0.5),
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    parent: parentWindow,
-    modal: true,
-    show: false,
-    frame: true,
-    closable: true,
-    transparent: false,
-    webPreferences: {
-      preload: path.join(__dirname, '../preload/index.js'),
-      sandbox: false
-    }
-  })
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>About</title>
-      <style>
-        body {
-          font-family: sans-serif;
-          margin: 0;
-          padding: 24px;
-          background: #1e1e1e;
-          color: white;
-        }
-
-        h1 { margin: 0 0 10px 0; }
-
-        .box {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        button {
-          margin-top: 20px;
-          padding: 8px 12px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-      </style>
-    </head>
-
-    <body>
-      <div class="box">
-        <h1>OpenFlexureConnect</h1>
-
-        <div>Version: ${app.getVersion()}</div>
-        <div>Electron: ${process.versions.electron}</div>
-        <div>Chrome: ${process.versions.chrome}</div>
-        <div>Node: ${process.versions.node}</div>
-
-        <button onclick="window.close()">Close</button>
-      </div>
-    </body>
-    </html>
-  `
-
-  aboutWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
-
-  aboutWindow.once('ready-to-show', () => {
-    aboutWindow.show()
-  })
-
-  aboutWindow.on('closed', () => {
-    aboutWindow = null
-  })
-}
 
 
 function createMainWindow() {
@@ -170,7 +84,9 @@ function createMainWindow() {
       submenu: [
         {
           label: 'About OpenFlexure Connect',
-          click: () => createAboutWindow(mainWindow)
+          click: () => {
+            mainWindow.webContents.send('open-about-modal')
+          }
         }
       ]
     }

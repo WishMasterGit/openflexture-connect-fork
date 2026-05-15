@@ -1,9 +1,10 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, shell } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import ipaddr from 'ipaddr.js'
 import mdns from 'mdns-js'
 
 let connectApi = {
+  openExternal: (url) => shell.openExternal(url),
   foundHosts: {},
   availableHosts: {},
   getMicroscopes: function () {
@@ -56,6 +57,11 @@ let connectApi = {
   removeSavedHost: (hostname) => ipcRenderer.send('removeHost', hostname)
 }
 connectApi.findMicroscopes()
+
+connectApi.getAppInfo = () => ipcRenderer.invoke('get-app-info')
+
+connectApi.onOpenAboutModal = (callback) =>
+  ipcRenderer.on('open-about-modal', callback)
 
 if (process.contextIsolated) {
   try {

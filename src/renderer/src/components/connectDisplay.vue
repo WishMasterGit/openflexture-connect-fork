@@ -1,5 +1,8 @@
 <template>
   <div class="connectDisplay uk-padding">
+
+    <AboutModal />
+
     <div id="connecting-modal" class="uk-flex-top" uk-modal="bg-close: false">
       <div
         class="uk-modal-dialog uk-width-auto uk-padding-small uk-modal-body uk-margin-auto-vertical"
@@ -124,6 +127,7 @@
 <script>
 import hostCard from './connectComponents/hostCard.vue'
 import axios from 'axios'
+import AboutModal from './AboutModal.vue'
 import UIkit from 'uikit'
 
 // Export main app
@@ -131,7 +135,8 @@ export default {
   name: 'ConnectDisplay',
 
   components: {
-    hostCard
+    hostCard,
+    AboutModal
   },
 
   data: function () {
