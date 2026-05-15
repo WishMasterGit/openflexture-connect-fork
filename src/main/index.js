@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
+import {  app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
 import { electronApp, is } from '@electron-toolkit/utils'
 import { initUpdater } from './updater'
 import icon from '../../public/icon.png?asset'
@@ -50,6 +50,8 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
+
+
 function createMainWindow() {
   // Create the main browser window to find microscopes.
   const mainWindow = new BrowserWindow({
@@ -77,7 +79,17 @@ function createMainWindow() {
         { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
       ]
     },
-    { role: 'about' }
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About OpenFlexure Connect',
+          click: () => {
+            mainWindow.webContents.send('open-about-modal')
+          }
+        }
+      ]
+    }
   ]
 
   const menu = Menu.buildFromTemplate(mainMenuTemplate)
@@ -175,9 +187,8 @@ function createMainWindow() {
           { type: 'separator' },
           { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' },
         ]
-      },
-      { role: 'about' }
-    ];
+      }
+    ]
 
     const menu = Menu.buildFromTemplate(childMenuTemplate)
     childWindow.setMenu(menu)
@@ -226,6 +237,25 @@ app.whenReady().then(() => {
 
   ipcMain.handle('getHosts', () => store.getHosts());
 
+  ipcMain.handle('get-app-info', () => {
+    return {
+      name: app.getName(),
+      version: app.getVersion(),
+      electron: process.versions.electron,
+      chrome: process.versions.chrome,
+      node: process.versions.node,
+      platform: process.platform
+    }
+  })
+
+  ipcMain.on('close-about-window', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+
+    if (win) {
+      win.close()
+    }
+  })
+
   const mainWindow = createMainWindow();
 
   // Check for updates 2s after window opens
@@ -269,13 +299,3 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
 });
-
-app.setAboutPanelOptions({
-  applicationName: 'OpenFlexureConnect',
-  iconPath: icon,
-  applicationVersion: app.getVersion(),
-  //credits is for Windows and MacOS, authors for Linux
-  credits: 'The OpenFlexure Project (openflexure.org)',
-  authors: ['The OpenFlexure Project (openflexure.org)'],
-  copyright: 'Distributed under the GNU GPL v3 license.'
-})
