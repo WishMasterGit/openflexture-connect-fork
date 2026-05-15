@@ -114,7 +114,7 @@ export default {
     },
     shouldShow: function () {
       if (this.hideIfUnavailable && !this.snapshotAvailable) {
-        return false
+        return true
       } else {
         return true
       }

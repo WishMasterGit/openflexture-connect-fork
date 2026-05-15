@@ -107,7 +107,7 @@
           <div class="uk-grid-medium uk-grid-match" uk-grid>
             <div v-for="host in savedHostArray" :key="host.name">
               <hostCard
-                name="Saved microscope"
+                :name="host.hostname"
                 :hostname="host.hostname"
                 :port="host.port"
                 :hide-if-unavailable="false"
@@ -204,7 +204,7 @@ export default {
     buildHostURL: function (hostname, port) {
       return window.api.buildHostURL(hostname, port)
     },
-    connectHost: function (host) {
+    connectHost: async function (host) {
       // Set the remote connect box values
       this.localMode = false
       this.hostname = host.hostname
@@ -213,29 +213,50 @@ export default {
       let selectedHostURL = this.buildHostURL(host.hostname, host.port)
       // Start the connecting spinner
       UIkit.modal('#connecting-modal').show()
-      axios
-        .get(`${selectedHostURL}/routes`)
-        .finally(() => {
-          UIkit.modal('#connecting-modal').hide()
-        })
-        .then((response) => {
-          // If the /api/v2 route is available
-          if (Object.keys(response.data).includes('/api/v2/')) {
-            window.open(selectedHostURL, 'modal')
-          } else {
-            // Error and no-connect if API v2 is missing
-            var ApiVersionError = `Your microscope is running an old API version.\
-            You must update your microscope software to continue.\
-            <br><br>
-            For API upgrades, burning the latest Raspbian-OpenFlexure to your SD card is recommended.\
-            <br><br>
-            <b>Downloads and instructions can be found <a target="_blank" href="https://openflexure.org/projects/microscope/install">here</a></b>`
-            this.modalDialog('API upgrade required', ApiVersionError)
-          }
-        })
-        .catch((error) => {
-          this.modalError(error) // Let mixin handle error
-        })
+      try {
+        if (await this.connectV3(selectedHostURL)) {
+          window.open(selectedHostURL, 'modal')
+        } else if (await this.connectFallback(selectedHostURL)) {
+          window.open(selectedHostURL, 'modal')
+        } else if (await this.connectV2(selectedHostURL)) {
+          window.open(selectedHostURL, 'modal')
+        } else {
+          let ApiVersionError = `This devices identifies as an OepnFlexure Microscope but
+          it is running an unrecognised version of the software.
+          `
+          this.modalDialog('API Unrecognised', ApiVersionError)
+        }
+      } finally {
+        UIkit.modal('#connecting-modal').hide()
+      }
+    },
+    connectV3: async function (selectedHostURL) {
+      try {
+        await axios.get(`${selectedHostURL}/api/v3/thing_descriptions.json`)
+        return true
+      } catch {
+        // Ignore errors, this route might not exist on the current device.
+      }
+      return false
+    },
+    connectFallback: async function (selectedHostURL) {
+      try {
+        const response = await axios.get(`${selectedHostURL}/openapi.json`)
+        if (response.data?.paths?.['/']?.get?.description?.includes('LabThings')) {
+          return true
+        }
+      } catch {
+        // Ignore errors, this route might not exist on the current device.
+      }
+      return false
+    },
+    connectV2: async function (selectedHostURL) {
+      try {
+        const response = await axios.get(`${selectedHostURL}/routes`)
+        return Object.keys(response.data).includes('/api/v2/')
+      } catch {
+        return false
+      }
     },
     saveHost: function (host) {
       window.api.saveHost({ hostname: host.hostname, port: host.port })
