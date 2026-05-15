@@ -60,8 +60,7 @@ connectApi.findMicroscopes()
 
 connectApi.getAppInfo = () => ipcRenderer.invoke('get-app-info')
 
-connectApi.onOpenAboutModal = (callback) =>
-  ipcRenderer.on('open-about-modal', callback)
+connectApi.onOpenAboutModal = (callback) => ipcRenderer.on('open-about-modal', callback)
 
 if (process.contextIsolated) {
   try {

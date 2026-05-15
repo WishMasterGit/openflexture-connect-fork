@@ -46,8 +46,8 @@ eslint:
     # this new rules section
     - !reference [.node_install, rules]
   script:
-    # Build JS application for production
-    - npm run lint
+    # Build JS application for production, erroring on any warnings
+    - npm run lint -- --max-warnings=0
 
 # Electron app build
 build:
