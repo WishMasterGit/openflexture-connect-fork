@@ -1,7 +1,6 @@
 <template>
   <div id="about-modal" uk-modal>
     <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical about-modal">
-
       <button class="uk-modal-close-default" type="button" uk-close></button>
 
       <!-- Logo -->
@@ -20,11 +19,8 @@
       </div>
 
       <div class="footer">
-        <a href="#" @click.prevent="openWebsite">
-        Learn more about OpenFlexure
-        </a>
+        <a href="#" @click.prevent="openWebsite"> Learn more about OpenFlexure </a>
       </div>
-
     </div>
   </div>
 </template>
@@ -42,18 +38,18 @@ export default {
       logo
     }
   },
-  
-  methods: {
-    openWebsite() {
-        window.api.openExternal('https://openflexure.org')
-    }
-    },
 
   mounted() {
     window.api.onOpenAboutModal(async () => {
       this.appInfo = await window.api.getAppInfo()
       UIkit.modal('#about-modal').show()
     })
+  },
+
+  methods: {
+    openWebsite() {
+      window.api.openExternal('https://openflexure.org')
+    }
   }
 }
 </script>

@@ -1,6 +1,5 @@
 <template>
   <div class="connectDisplay uk-padding">
-
     <AboutModal />
 
     <div id="connecting-modal" class="uk-flex-top" uk-modal="bg-close: false">
@@ -146,7 +145,7 @@ export default {
       port: 5000,
       savedHosts: {},
       foundHosts: {},
-      timer: null,
+      timer: null
     }
   },
 
