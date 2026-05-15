@@ -1,4 +1,4 @@
-# Note that the appId is org.openflexure.ev so that it is clear it is the sam application
+# Note that the appId is org.openflexure.ev so that it is clear it is the same application
 # as OpenFlexure eV, even though it is renamed OpenFlexure Connect. This will prevent both
 # apps installing side by side.
 appId: org.openflexure.ev

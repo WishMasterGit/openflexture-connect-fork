@@ -24,7 +24,7 @@ export function initUpdater(mainWindow) {
       type: 'info',
       title: 'Install update',
       message: 'Update downloaded. Restart now to install?',
-      buttons: ['Restart', 'Later']
+      buttons: ['Restart', 'Cancel update']
     }).then((result) => {
       if (result.response === 0) {
         autoUpdater.quitAndInstall()
