@@ -1,4 +1,4 @@
-import {  app, BrowserWindow, Menu, ipcMain, Tray, screen } from 'electron'
+import {  app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
 import { electronApp, is } from '@electron-toolkit/utils'
 import { initUpdater } from './updater'
 import icon from '../../public/icon.png?asset'
