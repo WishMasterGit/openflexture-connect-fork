@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
 import { electronApp, is } from '@electron-toolkit/utils'
+import { initUpdater } from './updater'
 import icon from '../../public/icon.png?asset'
 import path from 'path'
 import fs from 'fs'
@@ -73,7 +74,7 @@ function createMainWindow() {
         { role: 'reload', accelerator: 'CmdOrCtrl+R' },
         { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
         { type: 'separator' },
-        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I'}
+        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
       ]
     },
     { role: 'about' }
@@ -214,6 +215,7 @@ app.on('second-instance', () => {
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron');
 
+
   ipcMain.on('saveHost', (event, hostData) => {
     store.saveHost(hostData.hostname, hostData);
   });
@@ -225,6 +227,13 @@ app.whenReady().then(() => {
   ipcMain.handle('getHosts', () => store.getHosts());
 
   const mainWindow = createMainWindow();
+
+  // Check for updates 2s after window opens
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      initUpdater(mainWindow);
+    }, 2000);
+  });
 
   // Create tray icon
   tray = new Tray(icon); // Use your icon here
@@ -260,7 +269,6 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
   });
 });
-
 
 app.setAboutPanelOptions({
   applicationName: 'OpenFlexureConnect',
