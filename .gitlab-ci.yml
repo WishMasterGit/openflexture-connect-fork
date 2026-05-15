@@ -49,16 +49,6 @@ eslint:
     # Build JS application for production, erroring on any warnings
     - npm run lint -- --max-warnings=0
 
-prettier:
-  extends: .node_install
-  stage: analysis
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-  script:
-    - npm ci
-    - npm run format:check
-
 # Electron app build
 build:
   extends: .node_install

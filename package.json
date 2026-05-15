@@ -8,8 +8,6 @@
   "homepage": "https://www.openflexure.org",
   "license": "GPL-3.0",
   "scripts": {
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
     "lint": "eslint --cache .",
     "lint:fix": "eslint --cache --fix .",
     "start": "electron-vite preview",
