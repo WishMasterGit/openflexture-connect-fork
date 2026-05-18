@@ -1,4 +1,4 @@
-import {  app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
+import { app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
 import { electronApp, is } from '@electron-toolkit/utils'
 import { initUpdater } from './updater'
 import icon from '../../public/icon.png?asset'
@@ -50,8 +50,6 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
-
-
 function createMainWindow() {
   // Create the main browser window to find microscopes.
   const mainWindow = new BrowserWindow({
@@ -101,20 +99,17 @@ function createMainWindow() {
   // Intercept the close event to minimize if child windows exist
   mainWindow.on('close', (event) => {
     // Check if there are any open child windows
-    const openChildWindows = Array.from(childWindows.values()).some(
-      (win) => !win.isDestroyed()
-    );
+    const openChildWindows = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
 
     if (openChildWindows) {
-      event.preventDefault(); // prevent the default close behavior
-      mainWindow.hide(); // hide from screen
-      mainWindow.setSkipTaskbar(true); // hide from taskbar/dock
-      mainWindow.minimize();   // minimize instead of closing
+      event.preventDefault() // prevent the default close behavior
+      mainWindow.hide() // hide from screen
+      mainWindow.setSkipTaskbar(true) // hide from taskbar/dock
+      mainWindow.minimize() // minimize instead of closing
+    } else {
+      app.quit()
     }
-    else {
-      app.quit();
-    }
-  });
+  })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -128,12 +123,12 @@ function createMainWindow() {
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     // Check if a child window with this URL already exists
     if (childWindows.has(url)) {
-      const existingWindow = childWindows.get(url);
+      const existingWindow = childWindows.get(url)
       if (!existingWindow.isDestroyed()) {
-        existingWindow.focus();
-        return { action: 'deny' }; // prevent new window creation
+        existingWindow.focus()
+        return { action: 'deny' } // prevent new window creation
       } else {
-        childWindows.delete(url);
+        childWindows.delete(url)
       }
     }
 
@@ -144,48 +139,51 @@ function createMainWindow() {
       icon: icon,
       webPreferences: {
         preload: path.join(__dirname, '../preload/index.js'),
-        sandbox: false,
+        sandbox: false
       },
       parent: null,
       modal: false,
-      show: false,
-    });
+      show: false
+    })
 
-    childWindow.loadURL(url);
+    childWindow.loadURL(url)
 
-    childWindow.once('ready-to-show', () => childWindow.show());
+    childWindow.once('ready-to-show', () => childWindow.show())
 
     // Remove from map when closed
     childWindow.on('closed', () => {
-      childWindows.delete(url);
+      childWindows.delete(url)
 
       // If main is hidden and no children remain, quit app
-      const remainingChildren = Array.from(childWindows.values()).some(
-        (win) => !win.isDestroyed()
-      );
+      const remainingChildren = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
 
       if (!remainingChildren) {
-        const mainWindow = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+        const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
         if (mainWindow && mainWindow.isVisible() === false) {
-          app.quit();
+          app.quit()
         }
       }
-    });
+    })
 
     // Set menu for child windows
     const childMenuTemplate = [
       {
         label: 'File',
-        submenu: [{ role: 'close' }],
+        submenu: [{ role: 'close' }]
       },
       {
         label: 'View',
         submenu: [
           { role: 'reload', accelerator: 'CmdOrCtrl+R' },
           { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
-          { role: 'togglefullscreen', accelerator: 'F11', visible: false, acceleratorWorksWhenHidden : true },
+          {
+            role: 'togglefullscreen',
+            accelerator: 'F11',
+            visible: false,
+            acceleratorWorksWhenHidden: true
+          },
           { type: 'separator' },
-          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' },
+          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
         ]
       }
     ]
@@ -194,19 +192,19 @@ function createMainWindow() {
     childWindow.setMenu(menu)
 
     // Save reference
-    childWindows.set(url, childWindow);
+    childWindows.set(url, childWindow)
 
     // Prevent default window creation by Electron since this creates its own
-    return { action: 'deny' };
-  });
+    return { action: 'deny' }
+  })
 
-  return mainWindow;
+  return mainWindow
 }
 
 let tray = null
 
 app.on('second-instance', () => {
-  const child = Array.from(childWindows.values()).find(w => !w.isDestroyed())
+  const child = Array.from(childWindows.values()).find((w) => !w.isDestroyed())
 
   if (child) {
     if (child.isMinimized()) child.restore()
@@ -224,18 +222,17 @@ app.on('second-instance', () => {
 })
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.electron');
-
+  electronApp.setAppUserModelId('com.electron')
 
   ipcMain.on('saveHost', (event, hostData) => {
-    store.saveHost(hostData.hostname, hostData);
-  });
+    store.saveHost(hostData.hostname, hostData)
+  })
 
   ipcMain.on('removeHost', (event, hostname) => {
-    store.removeHost(hostname);
-  });
+    store.removeHost(hostname)
+  })
 
-  ipcMain.handle('getHosts', () => store.getHosts());
+  ipcMain.handle('getHosts', () => store.getHosts())
 
   ipcMain.handle('get-app-info', () => {
     return {
@@ -256,46 +253,46 @@ app.whenReady().then(() => {
     }
   })
 
-  const mainWindow = createMainWindow();
+  const mainWindow = createMainWindow()
 
   // Check for updates 2s after window opens
   mainWindow.once('ready-to-show', () => {
     setTimeout(() => {
-      initUpdater(mainWindow);
-    }, 2000);
-  });
+      initUpdater(mainWindow)
+    }, 2000)
+  })
 
   // Create tray icon
-  tray = new Tray(icon); // Use your icon here
+  tray = new Tray(icon) // Use your icon here
 
   const trayMenu = Menu.buildFromTemplate([
     {
       label: 'Show Main Window',
       click: () => {
-        mainWindow.setSkipTaskbar(false); // show in taskbar/dock again
-        mainWindow.show();
-        mainWindow.focus();
+        mainWindow.setSkipTaskbar(false) // show in taskbar/dock again
+        mainWindow.show()
+        mainWindow.focus()
       }
     },
     {
       label: 'Quit',
       click: () => {
-        app.quit();
+        app.quit()
       }
     }
-  ]);
+  ])
 
-  tray.setContextMenu(trayMenu);
-  tray.setToolTip('OpenFlexureConnect');
+  tray.setContextMenu(trayMenu)
+  tray.setToolTip('OpenFlexureConnect')
 
   // Double-click tray icon to reopen main window
   tray.on('double-click', () => {
-    mainWindow.setSkipTaskbar(false);
-    mainWindow.show();
-    mainWindow.focus();
-  });
+    mainWindow.setSkipTaskbar(false)
+    mainWindow.show()
+    mainWindow.focus()
+  })
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-  });
-});
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
+  })
+})
