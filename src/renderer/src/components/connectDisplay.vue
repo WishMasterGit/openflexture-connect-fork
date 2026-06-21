@@ -241,8 +241,8 @@ export default {
     },
     connectFallback: async function (selectedHostURL) {
       try {
-        const response = await axios.get(`${selectedHostURL}/openapi.json`)
-        if (response.data?.paths?.['/']?.get?.description?.includes('LabThings')) {
+        const response = await axios.get(`${selectedHostURL}/labthings_fallback`)
+        if (response.data === true) {
           return true
         }
       } catch {
