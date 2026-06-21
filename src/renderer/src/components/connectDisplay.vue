@@ -2,16 +2,6 @@
   <div class="connectDisplay uk-padding">
     <AboutModal />
 
-    <div id="connecting-modal" class="uk-flex-top" uk-modal="bg-close: false">
-      <div
-        class="uk-modal-dialog uk-width-auto uk-padding-small uk-modal-body uk-margin-auto-vertical"
-      >
-        <div class="uk-grid-match" uk-grid>
-          <div uk-spinner></div>
-          <h3>Connecting...</h3>
-        </div>
-      </div>
-    </div>
     <!-- New connection card (connect locally/remotely) -->
     <div
       id="new-connection-card"
@@ -110,7 +100,6 @@
                 :name="host.hostname"
                 :hostname="host.hostname"
                 :port="host.port"
-                :hide-if-unavailable="false"
                 :savable="false"
                 @connect="connectHost(host)"
                 @delete="removeHost(host)"
@@ -125,9 +114,7 @@
 
 <script>
 import hostCard from './connectComponents/hostCard.vue'
-import axios from 'axios'
 import AboutModal from './AboutModal.vue'
-import UIkit from 'uikit'
 
 // Export main app
 export default {
@@ -211,52 +198,7 @@ export default {
       this.port = host.port
       // Generate the host URL
       let selectedHostURL = this.buildHostURL(host.hostname, host.port)
-      // Start the connecting spinner
-      UIkit.modal('#connecting-modal').show()
-      try {
-        if (await this.connectV3(selectedHostURL)) {
-          window.open(selectedHostURL, 'modal')
-        } else if (await this.connectFallback(selectedHostURL)) {
-          window.open(selectedHostURL, 'modal')
-        } else if (await this.connectV2(selectedHostURL)) {
-          window.open(selectedHostURL, 'modal')
-        } else {
-          let ApiVersionError = `This devices identifies as an OepnFlexure Microscope but
-          it is running an unrecognised version of the software.
-          `
-          this.modalDialog('API Unrecognised', ApiVersionError)
-        }
-      } finally {
-        UIkit.modal('#connecting-modal').hide()
-      }
-    },
-    connectV3: async function (selectedHostURL) {
-      try {
-        await axios.get(`${selectedHostURL}/api/v3/thing_descriptions.json`)
-        return true
-      } catch {
-        // Ignore errors, this route might not exist on the current device.
-      }
-      return false
-    },
-    connectFallback: async function (selectedHostURL) {
-      try {
-        const response = await axios.get(`${selectedHostURL}/labthings_fallback`)
-        if (response.data === true) {
-          return true
-        }
-      } catch {
-        // Ignore errors, this route might not exist on the current device.
-      }
-      return false
-    },
-    connectV2: async function (selectedHostURL) {
-      try {
-        const response = await axios.get(`${selectedHostURL}/routes`)
-        return Object.keys(response.data).includes('/api/v2/')
-      } catch {
-        return false
-      }
+      window.open(selectedHostURL, 'modal')
     },
     saveHost: function (host) {
       window.api.saveHost({ hostname: host.hostname, port: host.port })
