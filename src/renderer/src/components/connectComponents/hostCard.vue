@@ -143,7 +143,7 @@ export default {
     },
     checkV3API: async function () {
       try {
-        await axios.get(`${this.hostURL}/api/v3/thing_descriptions`)
+        await axios.get(`${this.hostURL}/api/v3/things`)
         return true
       } catch {
         // Ignore errors, this route might not exist on the current device.
@@ -169,6 +169,16 @@ export default {
         return false
       }
     },
+    /**
+     * Change image source to a fallback image.
+     *
+     * This is called directly if no API is recognised or if the v3 fallback
+     * server is detected. It is also called if the the image fails to load
+     * a snapshot from the image source that is set.
+     *
+     * If the source currently is the v3 snapshot it will first try the v2
+     * snapshot url, as most v3 alphas do not have the v3 snapshot endpoint.
+     */
     useFallbackImage() {
       if (this.snapshotSrc?.includes('/api/v3/camera')) {
         this.snapshotSrc = `${this.hostURL}/api/v2/streams/snapshot?${Date.now()}`
