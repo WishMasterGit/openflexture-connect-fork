@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import ipaddr from 'ipaddr.js'
-import mdns from 'mdns-js'
+import bonjour from 'bonjour'
 
 let connectApi = {
   openExternal: (url) => shell.openExternal(url),
@@ -14,30 +14,18 @@ let connectApi = {
   findMicroscopes: function () {
     this.foundHosts = {}
     // Create a browser to search for 'openflexure' type services
-    var browser = mdns.createBrowser(mdns.tcp('openflexure'))
-
-    // Start discovering services when ready
-    browser.on('ready', function () {
-      browser.discover()
-    })
-
-    browser.on(
-      'update',
-      function (data) {
-        // We will be checking if it's a valid openflexure device
-        var validDevice = false
-
-        // Go through each type of the host, make valid if 'openflexure' appears
-        data.type.forEach((element) => {
-          if (element.name === 'openflexure') {
-            validDevice = true
-          }
-        })
-        if (typeof data.port !== 'undefined' && validDevice === true) {
-          this.foundHosts[data.addresses[0]] = {
-            hostname: data.addresses[0],
-            name: `${data.host} on ${data.networkInterface}`,
-            port: data.port
+    bonjour().find(
+      {
+        type: 'openflexure',
+        protocol: 'tcp'
+      },
+      function (service) {
+        if (typeof service.port !== 'undefined' && service.addresses.length > 0) {
+          let address = service.referer?.address || service.addresses[0]
+          this.foundHosts[address] = {
+            hostname: service.host,
+            name: `${service.host} on ${address}`,
+            port: service.port
           }
         }
       }.bind(this)
