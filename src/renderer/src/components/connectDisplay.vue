@@ -2,16 +2,6 @@
   <div class="connectDisplay uk-padding">
     <AboutModal />
 
-    <div id="connecting-modal" class="uk-flex-top" uk-modal="bg-close: false">
-      <div
-        class="uk-modal-dialog uk-width-auto uk-padding-small uk-modal-body uk-margin-auto-vertical"
-      >
-        <div class="uk-grid-match" uk-grid>
-          <div uk-spinner></div>
-          <h3>Connecting...</h3>
-        </div>
-      </div>
-    </div>
     <!-- New connection card (connect locally/remotely) -->
     <div
       id="new-connection-card"
@@ -107,10 +97,9 @@
           <div class="uk-grid-medium uk-grid-match" uk-grid>
             <div v-for="host in savedHostArray" :key="host.name">
               <hostCard
-                name="Saved microscope"
+                :name="host.hostname"
                 :hostname="host.hostname"
                 :port="host.port"
-                :hide-if-unavailable="false"
                 :savable="false"
                 @connect="connectHost(host)"
                 @delete="removeHost(host)"
@@ -125,9 +114,7 @@
 
 <script>
 import hostCard from './connectComponents/hostCard.vue'
-import axios from 'axios'
 import AboutModal from './AboutModal.vue'
-import UIkit from 'uikit'
 
 // Export main app
 export default {
@@ -204,38 +191,14 @@ export default {
     buildHostURL: function (hostname, port) {
       return window.api.buildHostURL(hostname, port)
     },
-    connectHost: function (host) {
+    connectHost: async function (host) {
       // Set the remote connect box values
       this.localMode = false
       this.hostname = host.hostname
       this.port = host.port
       // Generate the host URL
       let selectedHostURL = this.buildHostURL(host.hostname, host.port)
-      // Start the connecting spinner
-      UIkit.modal('#connecting-modal').show()
-      axios
-        .get(`${selectedHostURL}/routes`)
-        .finally(() => {
-          UIkit.modal('#connecting-modal').hide()
-        })
-        .then((response) => {
-          // If the /api/v2 route is available
-          if (Object.keys(response.data).includes('/api/v2/')) {
-            window.open(selectedHostURL, 'modal')
-          } else {
-            // Error and no-connect if API v2 is missing
-            var ApiVersionError = `Your microscope is running an old API version.\
-            You must update your microscope software to continue.\
-            <br><br>
-            For API upgrades, burning the latest Raspbian-OpenFlexure to your SD card is recommended.\
-            <br><br>
-            <b>Downloads and instructions can be found <a target="_blank" href="https://openflexure.org/projects/microscope/install">here</a></b>`
-            this.modalDialog('API upgrade required', ApiVersionError)
-          }
-        })
-        .catch((error) => {
-          this.modalError(error) // Let mixin handle error
-        })
+      window.open(selectedHostURL, 'modal')
     },
     saveHost: function (host) {
       window.api.saveHost({ hostname: host.hostname, port: host.port })

@@ -1,24 +1,15 @@
 <template>
-  <div
-    v-show="shouldShow"
-    class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium"
-  >
+  <div class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium">
     <div class="uk-card-media-top">
       <div class="snapshot-container uk-width-1-1 uk-height-auto">
         <img
-          v-show="snapshotAvailable"
           class="uk-width-1-1"
           :data-src="snapshotSrc"
           :src="snapshotSrc"
           width="300"
           height="225"
+          @error="useFallbackImage"
         />
-        <div
-          v-show="!snapshotAvailable"
-          class="uk-position-cover uk-flex uk-flex-center uk-flex-middle"
-        >
-          Snapshot unavailable
-        </div>
       </div>
     </div>
 
@@ -27,6 +18,7 @@
         class="uk-margin-small uk-margin-remove-left uk-margin-remove-right uk-flex uk-flex-middle"
       >
         <div class="uk-width-expand host-description">
+          <div v-if="errorMessage" class="host-error">{{ errorMessage }}</div>
           <div class="host-description">
             <b>{{ name }}</b>
           </div>
@@ -40,7 +32,7 @@
         class="uk-button uk-button-primary uk-form-small uk-margin-small-bottom uk-width-1-1"
         @click="$emit('connect')"
       >
-        Connect
+        {{ connectMessage }}
       </button>
       <button
         v-if="deletable"
@@ -62,6 +54,7 @@
 
 <script>
 import axios from 'axios'
+import logo from '../../assets/error.png'
 
 // Export main app
 export default {
@@ -88,42 +81,38 @@ export default {
       type: Boolean,
       required: false,
       default: true
-    },
-    hideIfUnavailable: {
-      type: Boolean,
-      required: false,
-      default: true
     }
   },
   emits: ['connect', 'delete', 'save', 'available', 'unavailable'],
   data: function () {
     return {
-      snapshotRule: '/api/v2/streams/snapshot',
-      snapshotSrc: '',
-      snapshotAvailable: false,
-      polling: null
+      snapshotSrc: undefined,
+      apiType: undefined,
+      polling: null,
+      errorInfo: undefined
     }
   },
 
   computed: {
-    routesURL: function () {
-      return `http://${this.hostname}:${this.port}/routes`
+    hostURL() {
+      return `http://${this.hostname}:${this.port}`
     },
-    snapshotURL: function () {
-      return `http://${this.hostname}:${this.port}${this.snapshotRule}`
+    errorMessage() {
+      if (this.errorInfo) return this.errorInfo
+      if (this.snapshotSrc !== logo) return null
+      return 'Snapshot unavailable'
     },
-    shouldShow: function () {
-      if (this.hideIfUnavailable && !this.snapshotAvailable) {
-        return false
-      } else {
-        return true
-      }
+    connectMessage() {
+      if (this.apiType === 'v3-fallback') return 'View Details'
+      return 'Connect'
     }
   },
 
   mounted() {
-    // Try to load the microscope snapshot when mounted
-    this.checkSnapshotAvailable()
+    this.checkAPI()
+    this.polling = setInterval(() => {
+      this.checkAPI()
+    }, 15000)
   },
 
   beforeUnmount() {
@@ -134,62 +123,67 @@ export default {
   },
 
   methods: {
-    checkSnapshotAvailable: function () {
-      // Fetches the list of routes from the host, and starts
-      // a snapshot timer if the snapshot route is available
-
-      // Send tag request
-      axios
-        .get(this.routesURL)
-        .then((response) => {
-          // If the host has a snapshot route available
-          if (this.snapshotRule in response.data) {
-            // Tell the view that a snapshot is available
-            this.setAvailability(true)
-            // Update the snapshot URL
-            this.updateSnapshotURL()
-            // If not already polling, start polling
-            if (this.polling === null) {
-              this.updateSnapshotPoll()
-            }
-          }
-        })
-        .catch(() => {
-          // Tell the view that a snapshot is not available, and ignore
-          this.setAvailability(false)
-        })
-    },
-
-    updateSnapshotURL: function () {
-      // Set the snapshot image src to the snapshot URL,
-      // adding a timestamp argument to act as a cache-breaker
-      var candidatesnapshotSrc = `${this.snapshotURL}?${Date.now()}`
-
-      axios
-        .head(candidatesnapshotSrc)
-        .then(() => {
-          this.setAvailability(true)
-          this.snapshotSrc = candidatesnapshotSrc
-        })
-        .catch(() => {
-          console.log('Snapshot unavailable')
-          this.setAvailability(false)
-        })
-    },
-
-    updateSnapshotPoll: function () {
-      // Start a timer to call updateSnapshotURL periodically
-      this.polling = setInterval(() => {
-        this.updateSnapshotURL()
-      }, 15000)
-    },
-
-    setAvailability: function (availability) {
-      this.snapshotAvailable = availability
-      if (availability === true) {
-        this.$emit('available')
+    checkAPI: async function () {
+      this.errorInfo = undefined
+      if (await this.checkV3API()) {
+        this.apiType = 'v3'
+        this.snapshotSrc = `${this.hostURL}/api/v3/camera/snapshot?${Date.now()}`
+      } else if (await this.checkFallbackAPI()) {
+        this.apiType = 'v3-fallback'
+        this.errorInfo = 'Server could not start.'
+        this.useFallbackImage()
+      } else if (await this.checkV2API()) {
+        this.apiType = 'v2'
+        this.snapshotSrc = `${this.hostURL}/api/v2/streams/snapshot?${Date.now()}`
       } else {
-        this.$emit('unavailable')
+        this.apiType = undefined
+        this.errorInfo = 'Unknown API.'
+        this.useFallbackImage()
+      }
+    },
+    checkV3API: async function () {
+      try {
+        await axios.get(`${this.hostURL}/api/v3/things`)
+        return true
+      } catch {
+        // Ignore errors, this route might not exist on the current device.
+      }
+      return false
+    },
+    checkFallbackAPI: async function () {
+      try {
+        const response = await axios.get(`${this.hostURL}/labthings_fallback`)
+        if (response.data === true) {
+          return true
+        }
+      } catch {
+        // Ignore errors, this route might not exist on the current device.
+      }
+      return false
+    },
+    checkV2API: async function () {
+      try {
+        const response = await axios.get(`${this.hostURL}/routes`)
+        return Object.keys(response.data).includes('/api/v2/')
+      } catch {
+        return false
+      }
+    },
+    /**
+     * Change image source to a fallback image.
+     *
+     * This is called directly if no API is recognised or if the v3 fallback
+     * server is detected. It is also called if the the image fails to load
+     * a snapshot from the image source that is set.
+     *
+     * If the source currently is the v3 snapshot it will first try the v2
+     * snapshot url, as most v3 alphas do not have the v3 snapshot endpoint.
+     */
+    useFallbackImage() {
+      if (this.snapshotSrc?.includes('/api/v3/camera')) {
+        this.snapshotSrc = `${this.hostURL}/api/v2/streams/snapshot?${Date.now()}`
+      } else {
+        this.snapshotSrc = logo
       }
     }
   }
@@ -197,6 +191,12 @@ export default {
 </script>
 
 <style>
+.host-error {
+  color: #d97706;
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 1em;
+}
 .host-description {
   text-overflow: ellipsis;
   overflow: hidden;
