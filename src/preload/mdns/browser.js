@@ -9,7 +9,8 @@
 
 import { EventEmitter } from 'node:events'
 
-import { DNSPacket, DNSRecord } from 'dns-js'
+import { DNSRecord } from './dnsrecord.js'
+import { DNSPacket } from './dnspacket.js'
 import { ServiceType } from './service_type.js'
 import { decodePackets } from './decoder.js'
 

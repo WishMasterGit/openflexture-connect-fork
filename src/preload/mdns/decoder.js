@@ -8,9 +8,11 @@
  */
 
 import { ServiceType } from './service_type.js'
-import * as dns from 'dns-js'
+import { DNSRecord } from './dnsrecord.js'
 
-const Record = dns.DNSRecord
+import { DNSPacket } from './dnspacket.js'
+
+const Record = DNSRecord
 
 function decodeSection(packet, sectionName, obj) {
   if (!Object.hasOwn(packet, sectionName)) {
@@ -36,9 +38,6 @@ function decodeSection(packet, sectionName, obj) {
       case Record.Type.PTR:
         obj.type = obj.type || []
 
-        //TODO: posibly check rec.data if it can be splitted by '.'
-        //      to detect if service name or not.
-        //      See pr #20
         if (packet.header.qr === 1 && rec.name.indexOf('_service') === 0) {
           if (rec.data) {
             obj.type.push(new ServiceType(rec.data.replace('.local', '')))
@@ -74,7 +73,7 @@ function decodeMessage(message) {
   var packets
 
   try {
-    packets = dns.DNSPacket.parse(message)
+    packets = DNSPacket.parse(message)
   } catch {
     return
   }
@@ -109,7 +108,7 @@ const decodePackets = (packets) => {
     decodeSection(packet, 'additional', data)
 
     packet.question.forEach(function (rec) {
-      if (rec.type === dns.DNSRecord.Type.PTR) {
+      if (rec.type === DNSRecord.Type.PTR) {
         query.push(rec.name)
       }
     })

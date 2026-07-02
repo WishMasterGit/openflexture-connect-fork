@@ -18,7 +18,7 @@ let connectApi = {
   findMicroscopes: function () {
     // set the browser to search for microscopes,
     var browser = createBrowser(tcp('openflexure'))
-        browser.on('ready', function () {
+    browser.on('ready', function () {
       browser.discover()
     })
 

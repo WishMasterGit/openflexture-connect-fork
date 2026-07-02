@@ -7,31 +7,34 @@
  * unchanged portions remain subject to the Apache License, Version 2.0.
  */
 
-import util from 'node:util'
 import { EventEmitter } from 'node:events'
 import os from 'node:os'
 import dgram from 'node:dgram'
-
-import { DNSPacket } from 'dns-js'
+import { DNSPacket } from './dnspacket.js'
 
 var MDNS_MULTICAST = '224.0.0.251'
 
-export class Networking {
-  constructor(options) {
+export class Networking extends EventEmitter {
+  constructor(options = {}) {
+    super()
+
     this.options = options || {}
     this.created = 0
     this.connections = []
     this.started = false
     this.users = []
-    this.INADDR_ANY = typeof this.options.INADDR_ANY === 'undefined' ? true : this.options.INADDR_ANY
+    this.INADDR_ANY =
+      typeof this.options.INADDR_ANY === 'undefined' ? true : this.options.INADDR_ANY
   }
   start() {
     var interfaces = os.networkInterfaces()
     var ifaceFilter = this.options.networkInterface
     var index = 0
     for (var key in interfaces) {
-      if (Object.hasOwn(interfaces, key) &&
-        (typeof ifaceFilter === 'undefined' || key === ifaceFilter)) {
+      if (
+        Object.hasOwn(interfaces, key) &&
+        (typeof ifaceFilter === 'undefined' || key === ifaceFilter)
+      ) {
         for (var i = 0; i < interfaces[key].length; i++) {
           var iface = interfaces[key][i]
           //no localhost
@@ -64,11 +67,7 @@ export class Networking {
       socket.unref()
     }
   }
-  createSocket(interfaceIndex,
-    networkInterface,
-    address,
-    port,
-    next) {
+  createSocket(interfaceIndex, networkInterface, address, port, next) {
     let sock = dgram.createSocket({ type: 'udp4', reuseAddr: true })
 
     sock.on('error', function (err) {
@@ -106,13 +105,15 @@ export class Networking {
     sock.on('message', function (message, remote) {
       var packets
       connection.counters.received++
+      console.log('msg')
+      console.log(message)
       try {
         packets = DNSPacket.parse(message)
         if (!(packets instanceof Array)) {
           packets = [packets]
         }
-      } catch {
-        //partial, skip it
+      } catch (err) {
+        console.log(err)
         return
       }
 
@@ -121,7 +122,7 @@ export class Networking {
 
     sock.on('error', self.onError.bind(self))
 
-    sock.on('close', function () { })
+    sock.on('close', function () {})
 
     if (this.created === this.connections.length) {
       this.emit('ready', this.connections.length)
@@ -132,6 +133,8 @@ export class Networking {
   }
   send(packet, next) {
     var buf = DNSPacket.toBuffer(packet)
+    console.log('buf')
+    console.log(buf)
     const netwk = this
     this.connections.forEach(onEach)
     onSent()
@@ -192,16 +195,3 @@ export class Networking {
     this.stopRequest()
   }
 }
-
-util.inherits(Networking, EventEmitter)
-
-
-
-
-
-
-
-
-
-
-
