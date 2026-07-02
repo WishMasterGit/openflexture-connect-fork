@@ -2,11 +2,7 @@
   <div class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium">
     <div class="uk-card-media-top">
       <div class="snapshot-container">
-        <img
-          :src="snapshotSrc"
-          class="snapshot-img"
-          @error="useFallbackImage"
-        />
+        <img :src="snapshotSrc" class="snapshot-img" @error="useFallbackImage" />
       </div>
     </div>
     <div class="uk-card-body uk-padding-small">
