@@ -176,7 +176,6 @@ export default {
   methods: {
     // This just re-reads an object
     reloadNearby: async function () {
-      console.log("hi")
       this.foundHosts = window.api.getMicroscopes()
     },
     getManualHost: function () {

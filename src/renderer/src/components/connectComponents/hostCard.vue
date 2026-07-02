@@ -105,13 +105,12 @@ export default {
       return 'Connect'
     },
     showCard() {
-      if (this.alwaysShow) return true;
-      return this.apiType !== undefined;
+      if (this.alwaysShow) return true
+      return this.apiType !== undefined
     }
   },
 
   mounted() {
-    console.log("Mounty!")
     this.checkAPI()
     this.polling = setInterval(() => {
       this.checkAPI()
@@ -129,8 +128,6 @@ export default {
     checkAPI: async function () {
       this.errorInfo = undefined
       this.count += 1
-      console.log(this.count)
-      console.log("checking")
       if (await this.checkV3API()) {
         this.apiType = 'v3'
         this.snapshotSrc = `${this.hostURL}/api/v3/camera/snapshot?${Date.now()}`
@@ -146,12 +143,10 @@ export default {
         this.errorInfo = 'Microscope offline'
         this.useFallbackImage()
       }
-      console.log(this.apiType)
     },
     checkV3API: async function () {
-      console.log("checking v3")
       try {
-        await axios.get(`${this.hostURL}/api/v3/things`, {timeout: 500})
+        await axios.get(`${this.hostURL}/api/v3/things`, { timeout: 500 })
         return true
       } catch {
         // Ignore errors, this route might not exist on the current device.
@@ -159,9 +154,8 @@ export default {
       return false
     },
     checkFallbackAPI: async function () {
-      console.log("checking fallback")
       try {
-        const response = await axios.get(`${this.hostURL}/labthings_fallback`, {timeout: 500})
+        const response = await axios.get(`${this.hostURL}/labthings_fallback`, { timeout: 500 })
         if (response.data === true) {
           return true
         }
@@ -171,9 +165,8 @@ export default {
       return false
     },
     checkV2API: async function () {
-      console.log("checking v2")
       try {
-        const response = await axios.get(`${this.hostURL}/routes`, {timeout: 500})
+        const response = await axios.get(`${this.hostURL}/routes`, { timeout: 500 })
         return Object.keys(response.data).includes('/api/v2/')
       } catch {
         return false
