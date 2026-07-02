@@ -101,6 +101,7 @@
                 :hostname="host.hostname"
                 :port="host.port"
                 :savable="false"
+                :always-show="true"
                 @connect="connectHost(host)"
                 @delete="removeHost(host)"
               ></hostCard>
@@ -153,8 +154,8 @@ export default {
   mounted() {
     this.timer = setInterval(() => {
       this.reloadNearby()
-    }, 10000)
-    this.foundHosts = window.api.getMicroscopes()
+    }, 1000)
+    this.reloadNearby()
     window.api
       .getSavedHosts()
       .then((response) => {
@@ -173,7 +174,9 @@ export default {
   },
 
   methods: {
+    // This just re-reads an object
     reloadNearby: async function () {
+      console.log("hi")
       this.foundHosts = window.api.getMicroscopes()
     },
     getManualHost: function () {

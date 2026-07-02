@@ -1,12 +1,13 @@
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import ipaddr from 'ipaddr.js'
-import bonjour from 'bonjour'
+import { Bonjour } from 'bonjour-service';
 
 let connectApi = {
   openExternal: (url) => shell.openExternal(url),
   foundHosts: {},
   availableHosts: {},
+  bonjour: null,
   browser: null,
   getMicroscopes: function () {
     console.log("get")
@@ -16,7 +17,8 @@ let connectApi = {
   },
   findMicroscopes: function () {
     // set the browser to search for microscopes,
-    this.browser = bonjour().find({
+    this.bonjour = new Bonjour();
+    this.browser = this.bonjour.find({
       type: 'openflexure',
       protocol: 'tcp'
     })
