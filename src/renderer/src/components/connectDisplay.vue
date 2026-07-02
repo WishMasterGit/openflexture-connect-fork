@@ -174,8 +174,6 @@ export default {
 
   methods: {
     reloadNearby: async function () {
-      window.api.findMicroscopes()
-      await new Promise((r) => setTimeout(r, 2000))
       this.foundHosts = window.api.getMicroscopes()
     },
     getManualHost: function () {

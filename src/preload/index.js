@@ -7,14 +7,14 @@ let connectApi = {
   openExternal: (url) => shell.openExternal(url),
   foundHosts: {},
   availableHosts: {},
+  browser: bonjour(),
   getMicroscopes: function () {
     this.availableHosts = { ...this.foundHosts }
     return this.availableHosts
   },
   findMicroscopes: function () {
-    this.foundHosts = {}
     // Create a browser to search for 'openflexure' type services
-    bonjour().find(
+    this.browser.find(
       {
         type: 'openflexure',
         protocol: 'tcp'
