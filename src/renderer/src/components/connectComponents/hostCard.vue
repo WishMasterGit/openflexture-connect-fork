@@ -1,18 +1,14 @@
 <template>
   <div class="hostCard uk-card uk-card-default uk-padding-remove uk-width-medium">
     <div class="uk-card-media-top">
-      <div class="snapshot-container uk-width-1-1 uk-height-auto">
+      <div class="snapshot-container">
         <img
-          class="uk-width-1-1"
-          :data-src="snapshotSrc"
           :src="snapshotSrc"
-          width="300"
-          height="225"
+          class="snapshot-img"
           @error="useFallbackImage"
         />
       </div>
     </div>
-
     <div class="uk-card-body uk-padding-small">
       <div
         class="uk-margin-small uk-margin-remove-left uk-margin-remove-right uk-flex uk-flex-middle"
@@ -210,5 +206,20 @@ export default {
 
 img[data-src][src*='data:image'] {
   background: rgba(127, 127, 127, 0.1);
+}
+
+.snapshot-container {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  position: relative;
+}
+
+.snapshot-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: block;
 }
 </style>
