@@ -7,29 +7,35 @@ let connectApi = {
   openExternal: (url) => shell.openExternal(url),
   foundHosts: {},
   availableHosts: {},
-  browser: bonjour(),
+  browser: null,
   getMicroscopes: function () {
+    console.log("get")
+    this.browser.update()
     this.availableHosts = { ...this.foundHosts }
     return this.availableHosts
   },
   findMicroscopes: function () {
-    // Create a browser to search for 'openflexure' type services
-    this.browser.find(
-      {
-        type: 'openflexure',
-        protocol: 'tcp'
-      },
-      function (service) {
-        if (typeof service.port !== 'undefined' && service.addresses.length > 0) {
-          let address = service.referer?.address || service.addresses[0]
-          this.foundHosts[address] = {
-            hostname: service.host,
-            name: `${service.host} on ${address}`,
-            port: service.port
-          }
+    // set the browser to search for microscopes,
+    this.browser = bonjour().find({
+      type: 'openflexure',
+      protocol: 'tcp'
+    })
+    this.browser.on('up', (service) => {
+      if (typeof service.port !== 'undefined' && service.addresses.length > 0) {
+        let address = service.referer?.address || service.addresses[0]
+        console.log('up')
+        console.log(service)
+        this.foundHosts[address] = {
+          hostname: service.host,
+          name: `${service.host} on ${address}`,
+          port: service.port
         }
-      }.bind(this)
-    )
+      }
+    })
+    this.browser.on('down', (service) => {
+      console.log('down')
+      console.log(service)
+    })
   },
   buildHostURL: function (hostname, port) {
     // IPv6-based URLs have to be wrapped in [] when specifying a port
