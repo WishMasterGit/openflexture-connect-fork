@@ -7,7 +7,7 @@
  * unchanged portions remain subject to the Apache License, Version 2.0.
  */
 
-import { Qap } from './qap.js'
+import { FastPatternMatch } from './fastPatternMatch.js'
 
 import { BufferConsumer } from './bufferconsumer.js'
 
@@ -67,8 +67,8 @@ export class BufferWriter {
     return this.buf.slice(start, end)
   }
   indexOf(text) {
-    var qap = new Qap(text)
-    return qap.parse(this.buf)
+    var patternMatcher = new FastPatternMatch(text)
+    return patternMatcher.findAllMatches(this.buf)
   }
   /**
    * Writes a DNS name. If ref is specified, will finish this name with a
@@ -84,7 +84,7 @@ export class BufferWriter {
     var parts = txt ? [v] : v.split('.')
     var parts2 = txt ? [v] : v.split('.')
     var consumer = new BufferConsumer(self.buf)
-    var qap = new Qap('')
+    var patternMatcher = new FastPatternMatch('')
     var lastPart = parts.length
     if (v.length > 0) {
       for (i = 0; i < parts.length; i++) {
@@ -93,8 +93,8 @@ export class BufferWriter {
           continue
         }
         part = Buffer.from(parts[i])
-        qap.set(Buffer.concat([Buffer.from([part.length]), part]))
-        var location = qap.parse(self.buf)[0]
+        patternMatcher.setPattern(Buffer.concat([Buffer.from([part.length]), part]))
+        var location = patternMatcher.findAllMatches(self.buf)[0]
         if (location) {
           var tr = consumer.seek(location).name()
           if (tr === parts2.join('.')) {
