@@ -10,8 +10,6 @@ let connectApi = {
   bonjour: null,
   browser: null,
   getMicroscopes: function () {
-    //this.browser.update()
-    //this.browser.expire()
     this.availableHosts = { ...this.foundHosts }
     return this.availableHosts
   },
@@ -43,21 +41,6 @@ let connectApi = {
         }
       }.bind(this)
     )
-    /*this.bonjour = new Bonjour()
-    this.browser = this.bonjour.find({
-      type: 'openflexure',
-      protocol: 'tcp'
-    })
-    this.browser.on('up', (service) => {
-      if (typeof service.port !== 'undefined' && service.addresses.length > 0) {
-        let address = service.referer?.address || service.addresses[0]
-        this.foundHosts[address] = {
-          hostname: service.host,
-          name: `${service.host} on ${address}`,
-          port: service.port
-        }
-      }
-    })*/
   },
   buildHostURL: function (hostname, port) {
     // IPv6-based URLs have to be wrapped in [] when specifying a port

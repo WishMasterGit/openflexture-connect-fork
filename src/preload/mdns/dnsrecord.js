@@ -118,7 +118,6 @@ export class DNSRecord {
         break
       default:
         throw new Error('Not implemented recordtype')
-      //this.data = new BufferConsumer(consumer.slice(dataSize));
     }
     var endPos = out.tell()
     //update with correct size
