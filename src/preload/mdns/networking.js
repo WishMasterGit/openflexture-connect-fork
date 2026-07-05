@@ -105,15 +105,13 @@ export class Networking extends EventEmitter {
     sock.on('message', function (message, remote) {
       var packets
       connection.counters.received++
-      console.log('msg')
-      console.log(message)
       try {
         packets = DNSPacket.parse(message)
         if (!(packets instanceof Array)) {
           packets = [packets]
         }
       } catch (err) {
-        console.log(err)
+        console.error(err)
         return
       }
 
@@ -133,8 +131,6 @@ export class Networking extends EventEmitter {
   }
   send(packet, next) {
     var buf = DNSPacket.toBuffer(packet)
-    console.log('buf')
-    console.log(buf)
     const netwk = this
     this.connections.forEach(onEach)
     onSent()

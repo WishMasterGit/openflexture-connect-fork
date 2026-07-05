@@ -1,15 +1,18 @@
+/*
+ * This file is derived from code in the dns-js project:
+ * https://github.com/mdns-js/node-dns-js
+ *
+ * Copyright for the original work remains with the original authors.
+ * Portions of this file have been modernised for this openflexure use, while
+ * unchanged portions remain subject to the Apache License, Version 2.0.
+ */
+
 import { BufferWriter } from './bufferwriter.js'
 import { BufferConsumer } from './bufferconsumer.js'
 import { DNSRecord } from './dnsrecord.js'
 import { MalformedPacket } from './errors.js'
 
 var MIN_RECORD_SIZE = 5
-/**
- * This callback is used for "each" methods
- * @callback DNSPacket~eachCallback
- * @param {DNSRecord} rec - DNSRecord that was found
- */
-
 var SECTION_NAMES = ['answer', 'authority', 'additional']
 var ALL_SECTION_NAMES = ['question'].concat(SECTION_NAMES)
 
@@ -67,12 +70,6 @@ function writeHeader(writer, packet) {
   writer.short(val)
 }
 
-/**
- * DNSPacket holds the state of a DNS packet. It can be modified or serialized
- * in-place.
- *
- * @constructor
- */
 /**
  * DNSPacket holds the state of a DNS packet. It can be modified or serialized
  * in-place.
@@ -202,14 +199,21 @@ DNSPacket.RCODE = {
 }
 
 /**
- * Get records from packet
+ * Get records from packet.
+ *
  * @param {DNSPacket.Section} section - record section [qd|an|ns|ar],
  * @param {DNSRecord.Type} [filter] - DNSRecord.Type to filter on
  * @param {DNSPacket~eachCallback} callback - Function callback
  */
 DNSPacket.prototype.each = each
 
-function each(section /*[,filter], callback*/) {
+/**
+ * Callback for each matching DNS record.
+ *
+ * @callback DNSPacket~eachCallback
+ * @param {DNSRecord} rec - DNSRecord that was found
+ */
+function each(section) {
   if (ALL_SECTION_NAMES.indexOf(section) === -1) {
     throw new Error('Unkown section, ' + section)
   }

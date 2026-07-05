@@ -69,11 +69,6 @@ export class BufferConsumer {
       end = this.buffer.length
     } else {
       end = this.tell() + length
-      // if (end > this.length) {
-      //   throw new errors.MalformedPacket(
-      //     'Trying to read past eof. Start=%d, End=%s, Length=%s',
-      //     this.tell(), end, this.length);
-      // }
     }
 
     if (!encoding) {
