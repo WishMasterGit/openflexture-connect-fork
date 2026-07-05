@@ -15,6 +15,13 @@ import { ServiceType } from './service_type.js'
 import { decodePackets } from './decoder.js'
 
 /**
+ * Return whether these objects are equal if JSON.stringify is applied
+ */
+function stringsEqual(input1, input2) {
+  return JSON.stringify(input1) === JSON.stringify(input2)
+}
+
+/**
  * mDNS Browser class
  * @class
  * @param {string|ServiceType} serviceType - The service type to browse for.
@@ -37,95 +44,101 @@ export class Browser extends EventEmitter {
       this.emit('ready')
     })
 
+    // bind(this) is required as we pass the method as a callback.
     this.onMessageListener = this.onMessage.bind(this)
     networking.on('packets', this.onMessageListener)
   }
 
   /**
-   * Handles incoming UDP traffic.
-   * @private
+   * Process the data from a single host
    */
   onMessage(packets, remote, connection) {
     const data = decodePackets(packets)
-    if (!data) {
+
+    // Return if there is no date
+    if (!data || typeof data.type === 'undefined') {
       return
     }
+
     let isNew = false
 
     const iface = connection.networkInterface
-    this.connections[iface] = this.connections[iface] || {
-      services: {},
-      addresses: {}
+    // If this is a new interface make a blank Object
+    if (!(iface in this.connections)) {
+      this.connections[iface] = { services: {}, addresses: {} }
     }
-    const { services, addresses } = this.connections[iface]
 
-    function setNew() {
+    // Store some connection and address details
+    data.interfaceIndex = connection.interfaceIndex
+    data.networkInterface = connection.networkInterface
+    data.addresses.push(remote.address)
+
+    // Loop through each service type this host defines
+    data.type.forEach((type) => {
+      let serviceKey = type.toString()
+      // If the service key is new, add it to services and mark that there is new data
+      if (!(serviceKey in this.connections[iface].services)) {
+        isNew = true
+        this.connections[iface].services[serviceKey] = {
+          type,
+          addresses: []
+        }
+      }
+
+      // Now loop through each address of this host
+      data.addresses.forEach((adr) => {
+        // Update the connection addresses in this.connections
+        isNew = this._update_connection_address(adr, serviceKey, iface, data) || isNew
+      })
+    })
+
+    // Emit the decoded service information if a new data was discovered
+    if (isNew) {
+      this.emit('update', data)
+    }
+  }
+
+  /**
+   * For a given address and serviceKey on a particular interface, update anything
+   * in this.connections that is not up to date.
+   *
+   * @returns {Boolean} Whether anything was updated or new
+   */
+  _update_connection_address(adr, serviceKey, iface, data) {
+    let isNew = false
+    // Add  any missing addresses to the service and mark that there is new data
+    if (!this.connections[iface].services[serviceKey].addresses.includes(adr)) {
+      this.connections[iface].services[serviceKey].addresses.push(adr)
       isNew = true
     }
 
-    function updateValue(src, dst, name) {
-      if (JSON.stringify(dst[name]) !== JSON.stringify(src)) {
-        setNew('updated host.%s', name)
-        dst[name] = src
-      }
+    // If the address is new for the connection save it and mark that there is new data
+    if (!(adr in this.connections[iface].addresses)) {
+      isNew = true
+      this.connections[iface].addresses[adr] = { address: adr }
     }
 
-    function addValue(src, dst, name) {
-      if (typeof dst[name] === 'undefined') {
-        setNew('added host.%s', name)
-        dst[name] = src
-      }
+    // If the service key is not defined for this address save it and mark that there is new data
+    if (this.connections[iface].addresses[adr][serviceKey] === undefined) {
+      isNew = true
+      this.connections[iface].addresses[adr][serviceKey] = {}
     }
 
-    if (data) {
-      data.interfaceIndex = connection.interfaceIndex
-      data.networkInterface = connection.networkInterface
-      data.addresses.push(remote.address)
-
-      if (typeof data.type !== 'undefined') {
-        data.type.forEach(function (type) {
-          let serviceKey = type.toString()
-          if (!Object.hasOwn(services, serviceKey)) {
-            setNew('new service - %s', serviceKey)
-            services[serviceKey] = {
-              type,
-              addresses: []
-            }
-          }
-
-          const service = services[serviceKey]
-          data.addresses.forEach(function (adr) {
-            if (service.addresses.indexOf(adr) === -1) {
-              service.addresses.push(adr)
-              setNew('new address')
-            }
-
-            let host
-            if (Object.hasOwn(addresses, adr)) {
-              host = addresses[adr]
-            } else {
-              host = addresses[adr] = { address: adr }
-              setNew('new host')
-            }
-            addValue({}, host, serviceKey)
-            updateValue(data.port, host[serviceKey], 'port')
-            updateValue(data.host, host[serviceKey], 'host')
-            updateValue(data.txt, host[serviceKey], 'txt')
-          })
-        })
-      }
-
-      /**
-       * Update event
-       * @event Browser#update
-       * @type {object}
-       * @property {string} networkInterface - name of network interface
-       * @property {number} interfaceIndex
-       */
-      if (isNew && data) {
-        this.emit('update', data)
-      }
+    // Finally for port, host, and txt. If they need setting or updating then do so
+    // and mark that there is new data
+    if (!stringsEqual(this.connections[iface].addresses[adr][serviceKey].port, data.port)) {
+      isNew = true
+      this.connections[iface].addresses[adr][serviceKey].port = data.port
     }
+    if (!stringsEqual(this.connections[iface].addresses[adr][serviceKey].host, data.host)) {
+      isNew = true
+      this.connections[iface].addresses[adr][serviceKey].host = data.host
+    }
+    if (!stringsEqual(this.connections[iface].addresses[adr][serviceKey].txt, data.txt)) {
+      isNew = true
+      this.connections[iface].addresses[adr][serviceKey].txt = data.txt
+    }
+    return isNew
   }
 
   stop() {
