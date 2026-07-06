@@ -159,7 +159,7 @@ export class Networking extends EventEmitter {
   }
   startRequest(callback) {
     if (this.started) {
-      return process.nextTick(callback())
+      return process.nextTick(callback)
     }
     this.start()
     this.once('ready', function () {
