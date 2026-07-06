@@ -16,12 +16,17 @@ include:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - when: never
 
-.on_release:
-  image: alpine:latest
-  # Only run on sem ver releases (including pre-releases), regex from https://semver.org/
+# Just the rules for on-release
+.on_release_rules:
   rules:
     - if: $CI_COMMIT_TAG =~ /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
     - when: never
+
+# A simple release job that checkes the tags match before moving further
+.on_release:
+  image: alpine:latest
+  # Only run on sem ver releases (including pre-releases), regex from https://semver.org/
+  extends: .on_release_rules
   before_script:
     - apk add openssh-client jq rsync
     # Read expected value from package.json
@@ -109,3 +114,17 @@ deploy:
     - echo -e "Host buildserver\n\tHostname build.openflexure.org\n\tUser gitlab-ci-user\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     # Run rsync
     - rsync -hrvz -e ssh dist/ buildserver:builds/openflexure-ev
+
+publish_snap:
+  stage: deploy
+  extends: .on_release_rules
+  image: snapcore/snapcraft:stable
+  needs:
+    - build
+
+  script:
+    # Publish snap package
+    - echo "Publishing snap package..."
+    - echo "$SNAPCRAFT_LOGIN" | base64 -d > snapcraft.login
+    - snapcraft login --with snapcraft.login
+    - for f in dist/*.snap; do snapcraft upload --release=stable $f; done
