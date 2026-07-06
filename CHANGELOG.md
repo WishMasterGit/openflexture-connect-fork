@@ -1,3 +1,17 @@
+## [5.0.0](https://gitlab.com/openflexure/openflexure-connect/compare/v4.0.0...v4.0.1) (2020-12-17)
+
+* Native support for the v3 APi of the Microscope and the v3 fallback server
+* A custom about modal
+* Fixed size image previews, preventing square streams overlapping other content.
+
+### Developer changes
+
+* Vendor our own updated copy of `mdns-js` and dependencies.
+* Update from Electron v9 to Electrion v36!
+* Update from Vue2 to Vue3
+* Re-scaffold the project with a newer dev toolchain and electron-vite
+
+
 ## [4.0.1](https://gitlab.com/openflexure/openflexure-connect/compare/v4.0.0...v4.0.1) (2020-12-17)
 
 * Publish to Snap store ([3aa2052](https://gitlab.com/openflexure/openflexure-connect/commit/3aa2052))
