@@ -20,16 +20,6 @@ import { MalformedPacket } from './errors.js'
  * @param {number} cl - class
  * @param {number} [optTTL] - time to live in seconds
  */
-/**
- * DNSRecord is a record inside a DNS packet; e.g. a QUESTION, or an ANSWER,
- * AUTHORITY, or ADDITIONAL record. Note that QUESTION records are special,
- * and do not have ttl or data.
- * @class
- * @param {string} name
- * @param {number} type
- * @param {number} cl - class
- * @param {number} [optTTL] - time to live in seconds
- */
 export class DNSRecord {
   constructor(name, type, cl, optTTL) {
     this.name = name

@@ -13,7 +13,7 @@
  * Copyright(nextByte) 2013-present Guglielmo Ferri <44gatti@gmail.com>
  * MIT Licensed
  *
- * This file has been largley rewritten for openflexure use. However, most changes
+ * This file has been largely rewritten for openflexure use. However, most changes
  * are to the names of variables and functions and to the layout of the code to
  * increase readability. The algorithm is unchanged. Any unchanged portions of code
  * remain subject to the MIT License.
