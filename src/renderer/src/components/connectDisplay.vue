@@ -76,14 +76,14 @@
         <a class="uk-accordion-title" href="#">Nearby devices</a>
         <div class="uk-accordion-content">
           <div class="uk-grid-medium uk-grid-match" uk-grid>
-            <div v-for="host in foundHostArray" :key="host.name">
+            <div v-for="key in foundHostKeys" :key="key">
               <hostCard
-                :name="host.name"
-                :hostname="host.hostname"
-                :port="host.port"
+                :name="foundHosts[key].name"
+                :hostname="foundHosts[key].hostname"
+                :port="foundHosts[key].port"
                 :deletable="false"
-                @connect="connectHost(host)"
-                @save="saveHost(host)"
+                @connect="connectHost(foundHosts[key])"
+                @save="saveHost(foundHosts[key])"
               ></hostCard>
             </div>
           </div>
@@ -141,8 +141,8 @@ export default {
     selectedHostURL: function () {
       return `http://${this.hostname}:${this.port}`
     },
-    foundHostArray: function () {
-      return Object.values(this.foundHosts)
+    foundHostKeys: function () {
+      return Object.keys(this.foundHosts)
     },
     savedHostArray: function () {
       return Object.values(this.savedHosts)
