@@ -32,7 +32,6 @@ import { MalformedPacket } from './errors.js'
  */
 export class DNSRecord {
   constructor(name, type, cl, optTTL) {
-    var self = this
     this.name = name
     this.type = type
     this.class = cl
@@ -47,19 +46,20 @@ export class DNSRecord {
 
     this.ttl = typeof optTTL !== 'undefined' ? optTTL : DNSRecord.TTL
     this.isQD = arguments.length === 3
-
-    this.__defineGetter__('typeName', function () {
-      return DNSRecord.TypeName[self.type]
-    })
-
-    this.__defineGetter__('className', function () {
-      return DNSRecord.ClassName[self.class & 0x7fff]
-    })
-
-    this.__defineGetter__('flag', function () {
-      return (self.class & 0x8000) >> 15
-    })
   }
+
+  get typeName() {
+    return DNSRecord.TypeName[this.type]
+  }
+
+  get className() {
+    return DNSRecord.ClassName[this.class & 0x7fff]
+  }
+
+  get flag() {
+    return (this.class & 0x8000) >> 15
+  }
+
   static write(out, rec) {
     if (rec.type === 0 || rec.class === 0) {
       throw new Error('Bad record with empty type and/or class')
