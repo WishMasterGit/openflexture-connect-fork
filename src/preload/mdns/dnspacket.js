@@ -64,8 +64,8 @@ function writeHeader(writer, packet) {
   val += (header.rd << 8) & 0x100
   val += (header.ra << 7) & 0x80
   val += (header.res1 << 6) & 0x40
-  val += (header.res1 << 5) & 0x20
-  val += (header.res1 << 4) & 0x10
+  val += (header.res2 << 5) & 0x20
+  val += (header.res3 << 4) & 0x10
   val += header.rcode & 0xf
   writer.short(val)
 }
