@@ -76,14 +76,14 @@
         <a class="uk-accordion-title" href="#">Nearby devices</a>
         <div class="uk-accordion-content">
           <div class="uk-grid-medium uk-grid-match" uk-grid>
-            <div v-for="host in foundHostArray" :key="host.name">
+            <div v-for="key in foundHostKeys" :key="key">
               <hostCard
-                :name="host.name"
-                :hostname="host.hostname"
-                :port="host.port"
+                :name="foundHosts[key].name"
+                :hostname="foundHosts[key].hostname"
+                :port="foundHosts[key].port"
                 :deletable="false"
-                @connect="connectHost(host)"
-                @save="saveHost(host)"
+                @connect="connectHost(foundHosts[key])"
+                @save="saveHost(foundHosts[key])"
               ></hostCard>
             </div>
           </div>
@@ -101,6 +101,7 @@
                 :hostname="host.hostname"
                 :port="host.port"
                 :savable="false"
+                :always-show="true"
                 @connect="connectHost(host)"
                 @delete="removeHost(host)"
               ></hostCard>
@@ -140,8 +141,8 @@ export default {
     selectedHostURL: function () {
       return `http://${this.hostname}:${this.port}`
     },
-    foundHostArray: function () {
-      return Object.values(this.foundHosts)
+    foundHostKeys: function () {
+      return Object.keys(this.foundHosts)
     },
     savedHostArray: function () {
       return Object.values(this.savedHosts)
@@ -153,8 +154,8 @@ export default {
   mounted() {
     this.timer = setInterval(() => {
       this.reloadNearby()
-    }, 10000)
-    this.foundHosts = window.api.getMicroscopes()
+    }, 1000)
+    this.reloadNearby()
     window.api
       .getSavedHosts()
       .then((response) => {
@@ -173,9 +174,8 @@ export default {
   },
 
   methods: {
+    // This just re-reads an object
     reloadNearby: async function () {
-      window.api.findMicroscopes()
-      await new Promise((r) => setTimeout(r, 2000))
       this.foundHosts = window.api.getMicroscopes()
     },
     getManualHost: function () {
