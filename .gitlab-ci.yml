@@ -16,7 +16,21 @@ include:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - when: never
 
+.on_release:
+  image: alpine:latest
+  # Only run on sem ver releases (including pre-releases), regex from https://semver.org/
+  rules:
+    - if: $CI_COMMIT_TAG =~ /v^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+    - when: never
+  before_script:
+    - apk add openssh-client jq rsync
+    # Read expected value from package.json
+    - package_ver=v$(jq -r '.version' package.json)
+    # Error if it doesn't match package.json
+    - '[[ "$package_ver" == "$CI_COMMIT_TAG" ]] || { echo "Version mismatch: tagged as $CI_COMMIT_TAG, package.json reads $package_ver" >&2; exit 1; }'
+
 stages:
+  - pre_release_check
   - analysis
   - build
   - deploy
@@ -74,27 +88,24 @@ build:
       - "./dist/*.yml"
       - "./dist/*.yaml"
 
+pre_release_check:
+  stage: pre_release_check
+  extends: .on_release
+  script:
+    echo "Version string matches tag!"
+
 deploy:
   stage: deploy
-  image: ubuntu:latest
+  extends: .on_release
   needs:
     - build
-  # Only run on full releases, regex from https://semver.org/
-  rules:
-    - if: $CI_COMMIT_TAG =~ /v^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
-    - when: never
-  before_script:
-    - apt-get update -y
-    - apt-get install -y openssh-client jq rsync
+  script:
+    # Setup SSH
     - eval $(ssh-agent -s)
     - chmod 400 "$OPENFLEXURE_BUILD_SERVER_SSH_KEY"
     - ssh-add "$OPENFLEXURE_BUILD_SERVER_SSH_KEY"
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo -e "Host buildserver\n\tHostname build.openflexure.org\n\tUser gitlab-ci-user\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-  script:
-    # Read expected value from package.json
-    - package_ver=v$(jq -r '.version' package.json)
-    # Error if it doesn't match package.json
-    - '[[ "$package_ver" == "$CI_COMMIT_TAG" ]] || { echo "Version mismatch: tagged as $CI_COMMIT_TAG, package.json reads $package_ver" >&2; exit 1; }'
+    # Run rsync
     - rsync -hrvz -e ssh dist/ buildserver:builds/openflexure-ev
