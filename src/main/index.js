@@ -148,6 +148,8 @@ function createMainWindow() {
 
     childWindow.loadURL(url)
 
+    childWindow.webContents.setVisualZoomLevelLimits(1, 3)
+
     childWindow.once('ready-to-show', () => childWindow.show())
 
     // Remove from map when closed
