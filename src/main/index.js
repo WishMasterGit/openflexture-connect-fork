@@ -50,6 +50,51 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
+function getCLIURL() {
+  const args = process.argv.slice(1)
+
+  const hostIndex = args.indexOf('--host')
+  const portIndex = args.indexOf('--port')
+
+  if (
+    hostIndex === -1 ||
+    portIndex === -1 ||
+    !args[hostIndex + 1] ||
+    !args[portIndex + 1]
+  ) {
+    return null
+  }
+
+  const hostname = args[hostIndex + 1]
+  const port = args[portIndex + 1]
+
+  // Only allow a hostname, not a custom URL or path
+  if (
+    hostname.includes('://') ||
+    hostname.includes('/') ||
+    hostname.includes('\\') ||
+    hostname.includes('?') ||
+    hostname.includes('#')
+  ) {
+    return null
+  }
+
+  // Only allow a numeric TCP port
+  if (!/^\d+$/.test(port)) {
+    return null
+  }
+
+  const portNumber = Number(port)
+
+  if (portNumber < 1 || portNumber > 65535) {
+    return null
+  }
+
+  return `http://${hostname}:${port}/index.html`
+}
+
+const cliURL = getCLIURL()
+
 function createMainWindow() {
   // Create the main browser window to find microscopes.
   const mainWindow = new BrowserWindow({
@@ -261,6 +306,68 @@ app.whenReady().then(() => {
       initUpdater(mainWindow)
     }, 2000)
   })
+
+  // Automatically open the host supplied on the command line
+  if (cliURL) {
+    const childWindow = new BrowserWindow({
+      width: 1200,
+      height: 900,
+      icon: icon,
+      webPreferences: {
+        preload: path.join(__dirname, '../preload/index.js'),
+        sandbox: false
+      },
+      parent: null,
+      modal: false,
+      show: false
+    })
+
+    childWindow.loadURL(cliURL)
+
+    childWindow.once('ready-to-show', () => childWindow.show())
+
+    childWindow.on('closed', () => {
+      childWindows.delete(cliURL)
+
+      const remainingChildren = Array.from(childWindows.values()).some(
+        (win) => !win.isDestroyed()
+      )
+
+      if (!remainingChildren) {
+        const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
+        if (mainWindow && mainWindow.isVisible() === false) {
+          app.quit()
+        }
+      }
+    })
+
+    const childMenuTemplate = [
+      {
+        label: 'File',
+        submenu: [{ role: 'close' }]
+      },
+      {
+        label: 'View',
+        submenu: [
+          { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+          { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+          {
+            role: 'togglefullscreen',
+            accelerator: 'F11',
+            visible: false,
+            acceleratorWorksWhenHidden: true
+          },
+          { type: 'separator' },
+          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
+        ]
+      }
+    ]
+
+    const menu = Menu.buildFromTemplate(childMenuTemplate)
+    childWindow.setMenu(menu)
+
+    childWindows.set(cliURL, childWindow)
+  }
 
   // Create tray icon
   tray = new Tray(icon) // Use your icon here
