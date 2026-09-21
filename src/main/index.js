@@ -50,14 +50,18 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
-function getCLIURL() {
+function getCLIOptions() {
   const args = process.argv.slice(1)
 
   const hostIndex = args.indexOf('--host')
   const portIndex = args.indexOf('--port')
+  const maximise = args.includes('--maximise')
 
   if (hostIndex === -1 || portIndex === -1 || !args[hostIndex + 1] || !args[portIndex + 1]) {
-    return null
+    return {
+      url: null,
+      maximise
+    }
   }
 
   const hostname = args[hostIndex + 1]
@@ -71,24 +75,38 @@ function getCLIURL() {
     hostname.includes('?') ||
     hostname.includes('#')
   ) {
-    return null
+    return {
+      url: null,
+      maximise
+    }
   }
 
   // Only allow a numeric TCP port
   if (!/^\d+$/.test(port)) {
-    return null
+    return {
+      url: null,
+      maximise
+    }
   }
 
   const portNumber = Number(port)
 
   if (portNumber < 1 || portNumber > 65535) {
-    return null
+    return {
+      url: null,
+      maximise
+    }
   }
 
-  return `http://${hostname}:${port}/index.html`
+  return {
+    url: `http://${hostname}:${port}/index.html`,
+    maximise
+  }
 }
 
-const cliURL = getCLIURL()
+const cliOptions = getCLIOptions()
+const cliURL = cliOptions.url
+const cliMaximise = cliOptions.maximise
 
 function createChildWindow(url) {
   // Check if a child window with this URL already exists
@@ -117,9 +135,13 @@ function createChildWindow(url) {
     show: false
   })
 
-  childWindow.loadURL(url)
-
-  childWindow.once('ready-to-show', () => childWindow.show())
+  childWindow.loadURL(url).then(() => {
+    if (cliMaximise) {
+      childWindow.maximize()
+    }
+    childWindow.show()
+    childWindow.focus()
+  })
 
   // Remove from map when closed
   childWindow.on('closed', () => {
@@ -214,6 +236,9 @@ function createMainWindow() {
 
   mainWindow.once('ready-to-show', () => {
     if (!cliURL) {
+      if (cliMaximise) {
+        mainWindow.maximize()
+      }
       mainWindow.show()
     }
   })
