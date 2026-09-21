@@ -56,12 +56,7 @@ function getCLIURL() {
   const hostIndex = args.indexOf('--host')
   const portIndex = args.indexOf('--port')
 
-  if (
-    hostIndex === -1 ||
-    portIndex === -1 ||
-    !args[hostIndex + 1] ||
-    !args[portIndex + 1]
-  ) {
+  if (hostIndex === -1 || portIndex === -1 || !args[hostIndex + 1] || !args[portIndex + 1]) {
     return null
   }
 
@@ -131,9 +126,7 @@ function createChildWindow(url) {
     childWindows.delete(url)
 
     // If main is hidden and no children remain, quit app
-    const remainingChildren = Array.from(childWindows.values()).some(
-      (win) => !win.isDestroyed()
-    )
+    const remainingChildren = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
 
     if (!remainingChildren) {
       const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
@@ -220,7 +213,9 @@ function createMainWindow() {
   mainWindow.setMenu(menu)
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    if (!cliURL) {
+      mainWindow.show()
+    }
   })
   // Intercept the close event to minimize if child windows exist
   mainWindow.on('close', (event) => {
