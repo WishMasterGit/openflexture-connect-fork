@@ -95,6 +95,87 @@ function getCLIURL() {
 
 const cliURL = getCLIURL()
 
+function createChildWindow(url) {
+  // Check if a child window with this URL already exists
+  if (childWindows.has(url)) {
+    const existingWindow = childWindows.get(url)
+
+    if (!existingWindow.isDestroyed()) {
+      existingWindow.focus()
+      return existingWindow
+    } else {
+      childWindows.delete(url)
+    }
+  }
+
+  // Create new child window for the URL
+  const childWindow = new BrowserWindow({
+    width: 1200,
+    height: 900,
+    icon: icon,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      sandbox: false
+    },
+    parent: null,
+    modal: false,
+    show: false
+  })
+
+  childWindow.loadURL(url)
+
+  childWindow.once('ready-to-show', () => childWindow.show())
+
+  // Remove from map when closed
+  childWindow.on('closed', () => {
+    childWindows.delete(url)
+
+    // If main is hidden and no children remain, quit app
+    const remainingChildren = Array.from(childWindows.values()).some(
+      (win) => !win.isDestroyed()
+    )
+
+    if (!remainingChildren) {
+      const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
+
+      if (mainWindow && mainWindow.isVisible() === false) {
+        app.quit()
+      }
+    }
+  })
+
+  // Set menu for child windows
+  const childMenuTemplate = [
+    {
+      label: 'File',
+      submenu: [{ role: 'close' }]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        {
+          role: 'togglefullscreen',
+          accelerator: 'F11',
+          visible: false,
+          acceleratorWorksWhenHidden: true
+        },
+        { type: 'separator' },
+        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
+      ]
+    }
+  ]
+
+  const menu = Menu.buildFromTemplate(childMenuTemplate)
+  childWindow.setMenu(menu)
+
+  // Save reference
+  childWindows.set(url, childWindow)
+
+  return childWindow
+}
+
 function createMainWindow() {
   // Create the main browser window to find microscopes.
   const mainWindow = new BrowserWindow({
@@ -166,80 +247,7 @@ function createMainWindow() {
 
   // Open a new window, if that URL doesn't already have a window open
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // Check if a child window with this URL already exists
-    if (childWindows.has(url)) {
-      const existingWindow = childWindows.get(url)
-      if (!existingWindow.isDestroyed()) {
-        existingWindow.focus()
-        return { action: 'deny' } // prevent new window creation
-      } else {
-        childWindows.delete(url)
-      }
-    }
-
-    // Create new child window for the URL
-    const childWindow = new BrowserWindow({
-      width: 1200,
-      height: 900,
-      icon: icon,
-      webPreferences: {
-        preload: path.join(__dirname, '../preload/index.js'),
-        sandbox: false
-      },
-      parent: null,
-      modal: false,
-      show: false
-    })
-
-    childWindow.loadURL(url)
-
-    childWindow.once('ready-to-show', () => childWindow.show())
-
-    // Remove from map when closed
-    childWindow.on('closed', () => {
-      childWindows.delete(url)
-
-      // If main is hidden and no children remain, quit app
-      const remainingChildren = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
-
-      if (!remainingChildren) {
-        const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
-        if (mainWindow && mainWindow.isVisible() === false) {
-          app.quit()
-        }
-      }
-    })
-
-    // Set menu for child windows
-    const childMenuTemplate = [
-      {
-        label: 'File',
-        submenu: [{ role: 'close' }]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'reload', accelerator: 'CmdOrCtrl+R' },
-          { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
-          {
-            role: 'togglefullscreen',
-            accelerator: 'F11',
-            visible: false,
-            acceleratorWorksWhenHidden: true
-          },
-          { type: 'separator' },
-          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
-        ]
-      }
-    ]
-
-    const menu = Menu.buildFromTemplate(childMenuTemplate)
-    childWindow.setMenu(menu)
-
-    // Save reference
-    childWindows.set(url, childWindow)
-
-    // Prevent default window creation by Electron since this creates its own
+    createChildWindow(url)
     return { action: 'deny' }
   })
 
@@ -309,64 +317,7 @@ app.whenReady().then(() => {
 
   // Automatically open the host supplied on the command line
   if (cliURL) {
-    const childWindow = new BrowserWindow({
-      width: 1200,
-      height: 900,
-      icon: icon,
-      webPreferences: {
-        preload: path.join(__dirname, '../preload/index.js'),
-        sandbox: false
-      },
-      parent: null,
-      modal: false,
-      show: false
-    })
-
-    childWindow.loadURL(cliURL)
-
-    childWindow.once('ready-to-show', () => childWindow.show())
-
-    childWindow.on('closed', () => {
-      childWindows.delete(cliURL)
-
-      const remainingChildren = Array.from(childWindows.values()).some(
-        (win) => !win.isDestroyed()
-      )
-
-      if (!remainingChildren) {
-        const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
-        if (mainWindow && mainWindow.isVisible() === false) {
-          app.quit()
-        }
-      }
-    })
-
-    const childMenuTemplate = [
-      {
-        label: 'File',
-        submenu: [{ role: 'close' }]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'reload', accelerator: 'CmdOrCtrl+R' },
-          { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
-          {
-            role: 'togglefullscreen',
-            accelerator: 'F11',
-            visible: false,
-            acceleratorWorksWhenHidden: true
-          },
-          { type: 'separator' },
-          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
-        ]
-      }
-    ]
-
-    const menu = Menu.buildFromTemplate(childMenuTemplate)
-    childWindow.setMenu(menu)
-
-    childWindows.set(cliURL, childWindow)
+    createChildWindow(cliURL)
   }
 
   // Create tray icon
