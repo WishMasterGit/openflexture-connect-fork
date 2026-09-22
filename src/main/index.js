@@ -143,6 +143,8 @@ function createChildWindow(url) {
     childWindow.focus()
   })
 
+  childWindow.webContents.setVisualZoomLevelLimits(1, 3)
+
   // Remove from map when closed
   childWindow.on('closed', () => {
     childWindows.delete(url)
@@ -268,6 +270,7 @@ function createMainWindow() {
   // Open a new window, if that URL doesn't already have a window open
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     createChildWindow(url)
+
     return { action: 'deny' }
   })
 
