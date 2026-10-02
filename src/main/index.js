@@ -50,6 +50,19 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
+/**
+ * Parse command-line options for launching a specific microscope host.
+ *
+ * If neither --host nor --port is supplied, the application starts normally
+ * and `url` is null. If both are supplied and valid, `url` contains the HTTP
+ * URL to open in a child window.
+ *
+ * The --maximise flag is returned independently and may be used with or
+ * without --host and --port.
+ *
+ * @returns {{url: string|null, maximise: boolean}}
+ * @throws {Error} If --host or --port is supplied incorrectly.
+ */
 function getCLIOptions() {
   const args = process.argv.slice(1)
 
@@ -57,15 +70,31 @@ function getCLIOptions() {
   const portIndex = args.indexOf('--port')
   const maximise = args.includes('--maximise')
 
-  if (hostIndex === -1 || portIndex === -1 || !args[hostIndex + 1] || !args[portIndex + 1]) {
+  if (hostIndex === -1 && portIndex === -1) {
     return {
       url: null,
       maximise
     }
   }
 
+  if (hostIndex === -1) {
+    throw new Error('Missing required argument: --host')
+  }
+
+  if (portIndex === -1) {
+    throw new Error('Missing required argument: --port')
+  }
+
   const hostname = args[hostIndex + 1]
   const port = args[portIndex + 1]
+
+  if (!hostname) {
+    throw new Error('Missing value for --host')
+  }
+
+  if (!port) {
+    throw new Error('Missing value for --port')
+  }
 
   // Only allow a hostname, not a custom URL or path
   if (
@@ -75,27 +104,20 @@ function getCLIOptions() {
     hostname.includes('?') ||
     hostname.includes('#')
   ) {
-    return {
-      url: null,
-      maximise
-    }
+    throw new Error(
+      `Invalid --host value "${hostname}". Expected a hostname, for example: --host localhost`
+    )
   }
 
   // Only allow a numeric TCP port
   if (!/^\d+$/.test(port)) {
-    return {
-      url: null,
-      maximise
-    }
+    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
   }
 
   const portNumber = Number(port)
 
   if (portNumber < 1 || portNumber > 65535) {
-    return {
-      url: null,
-      maximise
-    }
+    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
   }
 
   return {
@@ -104,11 +126,19 @@ function getCLIOptions() {
   }
 }
 
-const cliOptions = getCLIOptions()
+let cliOptions
+
+try {
+  cliOptions = getCLIOptions()
+} catch (error) {
+  console.error(`Invalid command-line arguments: ${error.message}`)
+  app.exit(1)
+}
+
 const cliURL = cliOptions.url
 const cliMaximise = cliOptions.maximise
 
-function createChildWindow(url) {
+function createChildWindow(url, isCLIWindow = false) {
   // Check if a child window with this URL already exists
   if (childWindows.has(url)) {
     const existingWindow = childWindows.get(url)
@@ -135,13 +165,33 @@ function createChildWindow(url) {
     show: false
   })
 
-  childWindow.loadURL(url).then(() => {
-    if (cliMaximise) {
-      childWindow.maximize()
-    }
-    childWindow.show()
-    childWindow.focus()
-  })
+  // If the window is being opened by the CLI and fails, log an error and exit
+  if (isCLIWindow) {
+    childWindow.webContents.once(
+      'did-fail-load',
+      (event, errorCode, errorDescription, validatedURL) => {
+        console.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`)
+
+        app.exit(1)
+      }
+    )
+  }
+
+  childWindow
+    .loadURL(url)
+    .then(() => {
+      if (isCLIWindow && cliMaximise) {
+        childWindow.maximize()
+      }
+      childWindow.show()
+      childWindow.focus()
+    })
+    .catch((error) => {
+      if (isCLIWindow) {
+        console.error(`Failed to load ${url}: ${error.message}`)
+        app.exit(1)
+      }
+    })
 
   childWindow.webContents.setVisualZoomLevelLimits(1, 3)
 
@@ -259,7 +309,7 @@ function createMainWindow() {
     }
   })
 
-  // HMR for renderer base on electron-vite cli.
+  // HMR for renderer based on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -340,7 +390,7 @@ app.whenReady().then(() => {
 
   // Automatically open the host supplied on the command line
   if (cliURL) {
-    createChildWindow(cliURL)
+    createChildWindow(cliURL, true)
   }
 
   // Create tray icon

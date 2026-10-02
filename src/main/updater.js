@@ -40,5 +40,8 @@ export function initUpdater(mainWindow) {
       })
   })
 
-  autoUpdater.checkForUpdates()
+  // Handle errors when trying to check for updates
+  autoUpdater.checkForUpdates().catch((error) => {
+    console.error('Update check failed:', error)
+  })
 }
