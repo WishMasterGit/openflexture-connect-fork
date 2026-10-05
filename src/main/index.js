@@ -50,6 +50,199 @@ let store = new connectStore()
 // Map to track child windows by URL
 const childWindows = new Map()
 
+/**
+ * Parse command-line options for launching a specific microscope host.
+ *
+ * If neither --host nor --port is supplied, the application starts normally
+ * and `url` is null. If both are supplied and valid, `url` contains the HTTP
+ * URL to open in a child window.
+ *
+ * The --maximise flag is returned independently and may be used with or
+ * without --host and --port.
+ *
+ * @returns {{url: string|null, maximise: boolean}}
+ * @throws {Error} If --host or --port is supplied incorrectly.
+ */
+function getCLIOptions() {
+  const args = process.argv.slice(1)
+
+  const hostIndex = args.indexOf('--host')
+  const portIndex = args.indexOf('--port')
+  const maximise = args.includes('--maximise')
+
+  if (hostIndex === -1 && portIndex === -1) {
+    return {
+      url: null,
+      maximise
+    }
+  }
+
+  if (hostIndex === -1) {
+    throw new Error('Missing required argument: --host')
+  }
+
+  if (portIndex === -1) {
+    throw new Error('Missing required argument: --port')
+  }
+
+  const hostname = args[hostIndex + 1]
+  const port = args[portIndex + 1]
+
+  if (!hostname) {
+    throw new Error('Missing value for --host')
+  }
+
+  if (!port) {
+    throw new Error('Missing value for --port')
+  }
+
+  // Only allow a hostname, not a custom URL or path
+  if (
+    hostname.includes('://') ||
+    hostname.includes('/') ||
+    hostname.includes('\\') ||
+    hostname.includes('?') ||
+    hostname.includes('#')
+  ) {
+    throw new Error(
+      `Invalid --host value "${hostname}". Expected a hostname, for example: --host localhost`
+    )
+  }
+
+  // Only allow a numeric TCP port
+  if (!/^\d+$/.test(port)) {
+    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
+  }
+
+  const portNumber = Number(port)
+
+  if (portNumber < 1 || portNumber > 65535) {
+    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
+  }
+
+  return {
+    url: `http://${hostname}:${port}/index.html`,
+    maximise
+  }
+}
+
+let cliOptions
+
+try {
+  cliOptions = getCLIOptions()
+} catch (error) {
+  console.error(`Invalid command-line arguments: ${error.message}`)
+  app.exit(1)
+}
+
+const cliURL = cliOptions.url
+const cliMaximise = cliOptions.maximise
+
+function createChildWindow(url, isCLIWindow = false) {
+  // Check if a child window with this URL already exists
+  if (childWindows.has(url)) {
+    const existingWindow = childWindows.get(url)
+
+    if (!existingWindow.isDestroyed()) {
+      existingWindow.focus()
+      return existingWindow
+    } else {
+      childWindows.delete(url)
+    }
+  }
+
+  // Create new child window for the URL
+  const childWindow = new BrowserWindow({
+    width: 1200,
+    height: 900,
+    icon: icon,
+    webPreferences: {
+      preload: path.join(__dirname, '../preload/index.js'),
+      sandbox: false
+    },
+    parent: null,
+    modal: false,
+    show: false
+  })
+
+  // If the window is being opened by the CLI and fails, log an error and exit
+  if (isCLIWindow) {
+    childWindow.webContents.once(
+      'did-fail-load',
+      (event, errorCode, errorDescription, validatedURL) => {
+        console.error(`Failed to load ${validatedURL}: ${errorDescription} (${errorCode})`)
+
+        app.exit(1)
+      }
+    )
+  }
+
+  childWindow
+    .loadURL(url)
+    .then(() => {
+      if (isCLIWindow && cliMaximise) {
+        childWindow.maximize()
+      }
+      childWindow.show()
+      childWindow.focus()
+    })
+    .catch((error) => {
+      if (isCLIWindow) {
+        console.error(`Failed to load ${url}: ${error.message}`)
+        app.exit(1)
+      }
+    })
+
+  childWindow.webContents.setVisualZoomLevelLimits(1, 3)
+
+  // Remove from map when closed
+  childWindow.on('closed', () => {
+    childWindows.delete(url)
+
+    // If main is hidden and no children remain, quit app
+    const remainingChildren = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
+
+    if (!remainingChildren) {
+      const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
+
+      if (mainWindow && mainWindow.isVisible() === false) {
+        app.quit()
+      }
+    }
+  })
+
+  // Set menu for child windows
+  const childMenuTemplate = [
+    {
+      label: 'File',
+      submenu: [{ role: 'close' }]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload', accelerator: 'CmdOrCtrl+R' },
+        { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
+        {
+          role: 'togglefullscreen',
+          accelerator: 'F11',
+          visible: false,
+          acceleratorWorksWhenHidden: true
+        },
+        { type: 'separator' },
+        { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
+      ]
+    }
+  ]
+
+  const menu = Menu.buildFromTemplate(childMenuTemplate)
+  childWindow.setMenu(menu)
+
+  // Save reference
+  childWindows.set(url, childWindow)
+
+  return childWindow
+}
+
 function createMainWindow() {
   // Create the main browser window to find microscopes.
   const mainWindow = new BrowserWindow({
@@ -94,7 +287,12 @@ function createMainWindow() {
   mainWindow.setMenu(menu)
 
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show()
+    if (!cliURL) {
+      if (cliMaximise) {
+        mainWindow.maximize()
+      }
+      mainWindow.show()
+    }
   })
   // Intercept the close event to minimize if child windows exist
   mainWindow.on('close', (event) => {
@@ -111,7 +309,7 @@ function createMainWindow() {
     }
   })
 
-  // HMR for renderer base on electron-vite cli.
+  // HMR for renderer based on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
@@ -121,82 +319,8 @@ function createMainWindow() {
 
   // Open a new window, if that URL doesn't already have a window open
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    // Check if a child window with this URL already exists
-    if (childWindows.has(url)) {
-      const existingWindow = childWindows.get(url)
-      if (!existingWindow.isDestroyed()) {
-        existingWindow.focus()
-        return { action: 'deny' } // prevent new window creation
-      } else {
-        childWindows.delete(url)
-      }
-    }
+    createChildWindow(url)
 
-    // Create new child window for the URL
-    const childWindow = new BrowserWindow({
-      width: 1200,
-      height: 900,
-      icon: icon,
-      webPreferences: {
-        preload: path.join(__dirname, '../preload/index.js'),
-        sandbox: false
-      },
-      parent: null,
-      modal: false,
-      show: false
-    })
-
-    childWindow.loadURL(url)
-
-    childWindow.webContents.setVisualZoomLevelLimits(1, 3)
-
-    childWindow.once('ready-to-show', () => childWindow.show())
-
-    // Remove from map when closed
-    childWindow.on('closed', () => {
-      childWindows.delete(url)
-
-      // If main is hidden and no children remain, quit app
-      const remainingChildren = Array.from(childWindows.values()).some((win) => !win.isDestroyed())
-
-      if (!remainingChildren) {
-        const mainWindow = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed())
-        if (mainWindow && mainWindow.isVisible() === false) {
-          app.quit()
-        }
-      }
-    })
-
-    // Set menu for child windows
-    const childMenuTemplate = [
-      {
-        label: 'File',
-        submenu: [{ role: 'close' }]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'reload', accelerator: 'CmdOrCtrl+R' },
-          { role: 'forceReload', accelerator: 'CmdOrCtrl+Shift+R' },
-          {
-            role: 'togglefullscreen',
-            accelerator: 'F11',
-            visible: false,
-            acceleratorWorksWhenHidden: true
-          },
-          { type: 'separator' },
-          { role: 'toggleDevTools', accelerator: 'CmdOrCtrl+Shift+I' }
-        ]
-      }
-    ]
-
-    const menu = Menu.buildFromTemplate(childMenuTemplate)
-    childWindow.setMenu(menu)
-
-    // Save reference
-    childWindows.set(url, childWindow)
-
-    // Prevent default window creation by Electron since this creates its own
     return { action: 'deny' }
   })
 
@@ -263,6 +387,11 @@ app.whenReady().then(() => {
       initUpdater(mainWindow)
     }, 2000)
   })
+
+  // Automatically open the host supplied on the command line
+  if (cliURL) {
+    createChildWindow(cliURL, true)
+  }
 
   // Create tray icon
   tray = new Tray(icon) // Use your icon here
