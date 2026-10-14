@@ -1,10 +1,17 @@
 import { app, BrowserWindow, Menu, ipcMain, Tray } from 'electron'
 import { electronApp, is } from '@electron-toolkit/utils'
 import { initUpdater } from './updater'
+import { parseCliOptions } from './cli_options'
 import icon from '../../public/icon.png?asset'
 import path from 'path'
 import fs from 'fs'
 
+// Parse CLI options before launching application
+const cliArgs = process.defaultApp ? process.argv.slice(2) : process.argv.slice(1)
+
+const { url: cliURL, maximise: cliMaximise } = parseCliOptions(cliArgs)
+
+// Single-instance lock
 const gotTheLock = app.requestSingleInstanceLock()
 
 if (!gotTheLock) {
@@ -49,94 +56,6 @@ let store = new connectStore()
 
 // Map to track child windows by URL
 const childWindows = new Map()
-
-/**
- * Parse command-line options for launching a specific microscope host.
- *
- * If neither --host nor --port is supplied, the application starts normally
- * and `url` is null. If both are supplied and valid, `url` contains the HTTP
- * URL to open in a child window.
- *
- * The --maximise flag is returned independently and may be used with or
- * without --host and --port.
- *
- * @returns {{url: string|null, maximise: boolean}}
- * @throws {Error} If --host or --port is supplied incorrectly.
- */
-function getCLIOptions() {
-  const args = process.argv.slice(1)
-
-  const hostIndex = args.indexOf('--host')
-  const portIndex = args.indexOf('--port')
-  const maximise = args.includes('--maximise')
-
-  if (hostIndex === -1 && portIndex === -1) {
-    return {
-      url: null,
-      maximise
-    }
-  }
-
-  if (hostIndex === -1) {
-    throw new Error('Missing required argument: --host')
-  }
-
-  if (portIndex === -1) {
-    throw new Error('Missing required argument: --port')
-  }
-
-  const hostname = args[hostIndex + 1]
-  const port = args[portIndex + 1]
-
-  if (!hostname) {
-    throw new Error('Missing value for --host')
-  }
-
-  if (!port) {
-    throw new Error('Missing value for --port')
-  }
-
-  // Only allow a hostname, not a custom URL or path
-  if (
-    hostname.includes('://') ||
-    hostname.includes('/') ||
-    hostname.includes('\\') ||
-    hostname.includes('?') ||
-    hostname.includes('#')
-  ) {
-    throw new Error(
-      `Invalid --host value "${hostname}". Expected a hostname, for example: --host localhost`
-    )
-  }
-
-  // Only allow a numeric TCP port
-  if (!/^\d+$/.test(port)) {
-    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
-  }
-
-  const portNumber = Number(port)
-
-  if (portNumber < 1 || portNumber > 65535) {
-    throw new Error(`Invalid --port value "${port}". Expected a number between 1 and 65535`)
-  }
-
-  return {
-    url: `http://${hostname}:${port}/index.html`,
-    maximise
-  }
-}
-
-let cliOptions
-
-try {
-  cliOptions = getCLIOptions()
-} catch (error) {
-  console.error(`Invalid command-line arguments: ${error.message}`)
-  app.exit(1)
-}
-
-const cliURL = cliOptions.url
-const cliMaximise = cliOptions.maximise
 
 function createChildWindow(url, isCLIWindow = false) {
   // Check if a child window with this URL already exists
