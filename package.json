@@ -17,11 +17,13 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux --publish never"
+    "build:linux": "npm run build && electron-builder --linux --publish never",
+    "test:unit": "node --test tests/cli-options.test.js"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
+    "commander": "^15.0.0",
     "electron-updater": "^6.6.2"
   },
   "devDependencies": {
